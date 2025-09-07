@@ -7,7 +7,7 @@ export const auth = betterAuth({
     cors: {
         origin: [
             "http://localhost:3000",
-            "https://taskcalibur-vector-sand.vercel.app/"
+            "https://task-ai-rust.vercel.app"
         ]
     },
     database: prismaAdapter(prisma, {
