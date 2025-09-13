@@ -1,3 +1,5 @@
+"use client"
+
 import { useRef, useState } from "react";
 import { TaskDB } from "../../types";
 import { formatTime } from "@/lib/utils";
@@ -9,6 +11,7 @@ interface TaskItemProps {
   task: TaskDB;
   tasks: TaskDB[];
   index: number;
+  id: number;
 }
 
 export default function TaskItem({
@@ -16,6 +19,7 @@ export default function TaskItem({
   tasks,
   index,
   setTasks,
+  id
 }: TaskItemProps) {
   const [completeCheck, setCheck] = useState(false);
   const taskName = useRef<HTMLInputElement>(null);
@@ -26,7 +30,7 @@ export default function TaskItem({
     setNodeRef,
     transform,
     transition
-  } = useSortable({ id: props.id })
+  } = useSortable({ id: task.id })
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -92,7 +96,7 @@ export default function TaskItem({
       {...listeners}
       className="flex items-center gap-3 px-4 cursor-move
             border-b border-gray-250 hover:bg-gray-50"
-      style={{ height: "40px" }, {style}}
+      style={{...style, height: "40px" }}
     >
       <input
         type="checkbox"

@@ -160,7 +160,6 @@ export function useGanttDrag({
     // if (isDragging && dragStartInfo) {
 
     // }
-    console.log("updated Task: ", updatedTask);
     if (updatedTask.current) {
       const response = await fetch("/api/updateTask", {
         method: "POST",

@@ -1,4 +1,4 @@
-import { DndContext, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
+import { closestCenter, DndContext, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
 import { TaskDB } from "../../types";
 import TaskItem from "./TaskItem";
 import CreateTaskButton from "./createTaskButton";
@@ -25,10 +25,11 @@ export default function TaskList({
 
     if(active.id !== over.id) {
       setTasks((prevTasks) => {
-        const oldIndex = prevTasks.indexOf(active.id)
-        const newIndex = prevTasks.indexOf(over.id)
+        const oldIndex = prevTasks.findIndex((t) => t.id == active.id)
+        const newIndex = prevTasks.findIndex((t) => t.id == over.id)
+        const move = arrayMove(prevTasks, oldIndex, newIndex);
 
-        return arrayMove(tasks, oldIndex, newIndex);
+        return move;
       })
     }
   }
@@ -43,15 +44,17 @@ export default function TaskList({
         <DndContext
           sensors={sensors}
           // collisionDetection={} It should be rectBoundry
+          collisionDetection={closestCenter}
           onDragEnd={handleDragEnd}
         >
           <SortableContext
-            items={tasks}
+            items={tasks.map(t => t.id)}
             strategy={verticalListSortingStrategy}
           >
             {tasks.map((task, index) => (
               <TaskItem
-                key={index}
+                id={task.id}
+                key={task.id}
                 task={task}
                 tasks={tasks}
                 index={index}
