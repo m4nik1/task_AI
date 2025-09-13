@@ -5,6 +5,7 @@ import { useGanttDrag } from "../../hooks/use-gantt-drag";
 import { TaskDB } from "../../types";
 import TaskList from "./TaskList";
 import GantGrid from "./gantt-grid";
+import { DndContext } from "@dnd-kit/core";
 
 interface HomeProps {
   taskDB: TaskDB[];
@@ -24,20 +25,20 @@ export default function HomePageClient({ taskDB }: HomeProps) {
   const [tasks, setTasks] = useState<TaskDB[]>(taskDB);
   const [currentTasks, setCurrentTasks] = useState<TaskDB[]>([]);
 
-  const {
-    isDragging,
-    dragStartInfo,
-    tempTask,
-    handleMouseUp,
-    handleMouseDown,
-  } = useGanttDrag({
-    currentTasks,
-    setCurrentTasks,
-    gridRef,
-    HOUR_WIDTH_PX,
-    START_HOUR_DISPLAY,
-    END_HOUR_DISPLAY,
-  });
+  // const {
+  //   isDragging,
+  //   dragStartInfo,
+  //   tempTask,
+  //   handleMouseUp,
+  //   handleMouseDown,
+  // } = useGanttDrag({
+  //   currentTasks,
+  //   setCurrentTasks,
+  //   gridRef,
+  //   HOUR_WIDTH_PX,
+  //   START_HOUR_DISPLAY,
+  //   END_HOUR_DISPLAY,
+  // });
 
   function checkingDates(date1: Date, date2: Date) {
     return (
@@ -46,13 +47,13 @@ export default function HomePageClient({ taskDB }: HomeProps) {
   }
 
   const tasksForDate = tasks.filter((t) =>
-    checkingDates(new Date(t.startTime), currentDate)
+    checkingDates(new Date(t.startTime), currentDate),
   );
 
   const navigateDate = (direction: number) => {
     const newDate = new Date(currentDate);
     newDate.setDate(currentDate.getDate() + direction);
-    console.log("Tasks are filtered by date: ", currentTasks)
+    console.log("Tasks are filtered by date: ", currentTasks);
     setCurrentDate(newDate);
   };
 
@@ -63,25 +64,22 @@ export default function HomePageClient({ taskDB }: HomeProps) {
   return (
     <div className="flex h-screen">
       <div className="flex-1 flex bg-gray-50">
-        <TaskList
-          tasks={currentTasks}
-          setTasks={setCurrentTasks}
-          setDraggedTask={setDraggedTask}
-          setDraggedTaskIndex={setDraggedTaskIndex}
-          dragStartInfo={dragStartInfo}
-          currentDate={currentDate}
-        />
+          <TaskList
+            tasks={tasks}
+            setTasks={setTasks}
+            currentDate={currentDate}
+          />
 
-        <GantGrid
-          setTasks={setCurrentTasks}
-          tasks={currentTasks}
-          gridRef={gridRef}
-          handleMouseDown={handleMouseDown}
-          dragStartInfo={dragStartInfo}
-          draggedTask={draggedTask}
-          navigateDate={navigateDate}
-          currentDate={currentDate}
-        />
+          {/* <GantGrid
+            setTasks={setCurrentTasks}
+            tasks={currentTasks}
+            gridRef={gridRef}
+            handleMouseDown={handleMouseDown}
+            dragStartInfo={dragStartInfo}
+            draggedTask={draggedTask}
+            navigateDate={navigateDate}
+            currentDate={currentDate}
+          /> */}
       </div>
     </div>
   );

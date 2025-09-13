@@ -1,10 +1,10 @@
 import { useRef, useState } from "react";
 import { TaskDB } from "../../types";
 import { formatTime } from "@/lib/utils";
+import { useSortable } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 
 interface TaskItemProps {
-  setDraggedTask: (id: string | null) => void;
-  setDraggedTaskIndex: (index: number | null) => void;
   setTasks: React.Dispatch<React.SetStateAction<TaskDB[]>>;
   task: TaskDB;
   tasks: TaskDB[];
@@ -12,8 +12,6 @@ interface TaskItemProps {
 }
 
 export default function TaskItem({
-  setDraggedTask,
-  setDraggedTaskIndex,
   task,
   tasks,
   index,
@@ -21,6 +19,19 @@ export default function TaskItem({
 }: TaskItemProps) {
   const [completeCheck, setCheck] = useState(false);
   const taskName = useRef<HTMLInputElement>(null);
+
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition
+  } = useSortable({ id: props.id })
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition
+  }
 
   function taskComplete(complete: boolean) {
     const newTasks = [...tasks];
@@ -74,39 +85,14 @@ export default function TaskItem({
     }
   }
 
-  function onTaskDrop(e: React.DragEvent<HTMLDivElement>) {
-    e.preventDefault();
-    const dropIndex = Number.parseInt(e.dataTransfer.getData("text/plain"), 10);
-    if (dropIndex != index) {
-      const newTasks = [...tasks];
-      const [movedTask] = newTasks.splice(dropIndex, 1);
-      newTasks.splice(index, 0, movedTask);
-      setTasks(newTasks);
-    }
-    setDraggedTaskIndex(null);
-  }
-
   return (
     <div
+      ref={setNodeRef}
+      {...attributes}
+      {...listeners}
       className="flex items-center gap-3 px-4 cursor-move
             border-b border-gray-250 hover:bg-gray-50"
-      style={{ height: "40px" }}
-      draggable
-      onDragStart={(e) => {
-        setDraggedTask(task.id?.toString() ?? null);
-        setDraggedTaskIndex(index);
-        e.dataTransfer.effectAllowed = "move";
-        e.dataTransfer.setData("text/plain", index.toString());
-      }}
-      onDragOver={(e) => {
-        e.preventDefault();
-        e.dataTransfer.dropEffect = "move";
-      }}
-      onDrop={(e) => onTaskDrop(e)}
-      onDragEnd={() => {
-        setDraggedTask(null);
-        setDraggedTaskIndex(null);
-      }}
+      style={{ height: "40px" }, {style}}
     >
       <input
         type="checkbox"
@@ -124,7 +110,7 @@ export default function TaskItem({
           defaultValue={task.name}
           ref={taskName}
         />
-        <div className="flex items-center text-xs text-gray-500 mt-0.5">
+        <div className="flex items-center text-xs background-gray mt-0.5">
           <span>{formatTime(task.startTime.getHours())}</span>
           <span className="mx-1">-</span>
           <span>
