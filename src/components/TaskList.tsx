@@ -1,4 +1,4 @@
-import { closestCenter, DndContext, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
+import { closestCenter, DndContext, DragEndEvent, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
 import { TaskDB } from "../../types";
 import TaskItem from "./TaskItem";
 import CreateTaskButton from "./createTaskButton";
@@ -20,13 +20,13 @@ export default function TaskList({
     useSensor(PointerSensor)
   )
 
-  function handleDragEnd(event) {
+  function handleDragEnd(event: DragEndEvent) {
     const {active, over} = event
 
-    if(active.id !== over.id) {
+    if(active.id !== over?.id) {
       setTasks((prevTasks) => {
         const oldIndex = prevTasks.findIndex((t) => t.id == active.id)
-        const newIndex = prevTasks.findIndex((t) => t.id == over.id)
+        const newIndex = prevTasks.findIndex((t) => t.id == over?.id)
         const move = arrayMove(prevTasks, oldIndex, newIndex);
 
         return move;
