@@ -70,16 +70,13 @@ export default function HomePageClient({ taskDB }: HomeProps) {
             currentDate={currentDate}
           />
 
-          {/* <GantGrid
-            setTasks={setCurrentTasks}
-            tasks={currentTasks}
+          <GantGrid
+            setTasks={setTasks}
+            tasks={tasks}
             gridRef={gridRef}
-            handleMouseDown={handleMouseDown}
-            dragStartInfo={dragStartInfo}
-            draggedTask={draggedTask}
             navigateDate={navigateDate}
             currentDate={currentDate}
-          /> */}
+          />
       </div>
     </div>
   );

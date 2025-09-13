@@ -12,20 +12,15 @@ interface DragStartInfo {
 interface GantTaskProps {
   task: TaskDB;
   index: number;
-  handleMouseDown: (e: React.MouseEvent) => void;
-  dragStartInfo: DragStartInfo | null;
 }
 
 export default function GantTask({
   task,
   index,
-  handleMouseDown,
-  dragStartInfo,
 }: GantTaskProps) {
   const HOUR_WIDTH_PX = 70; // Pixels per hour
   const START_HOUR_DISPLAY = 7; // Start time for the visible grid (7 AM)
 
-  const isActive = dragStartInfo?.taskId === task.id?.toString();
 
   return (
     <div
@@ -38,9 +33,7 @@ export default function GantTask({
         }px`,
         width: (task.Duration / 60) * HOUR_WIDTH_PX,
         top: `${index * 40 + 10}px`,
-        transition: isActive ? "none" : "transform 0.2s ease",
       }}
-      onMouseDown={handleMouseDown}
     >
       <span className="truncate pointer-events-none select-none">
         {task.name}
