@@ -1,46 +1,41 @@
-import { TaskDB } from "../../types";
+"use client";
 
-interface DragStartInfo {
-  startX: number;
-  startHour: number;
-  taskId: string | null;
-  isResizing: boolean;
-  initialDuration?: number;
-  initialStartHour?: number;
-}
+import { useDraggable } from "@dnd-kit/core";
+import { TaskDB } from "../../types";
 
 interface GantTaskProps {
   task: TaskDB;
   index: number;
-  handleMouseDown: (e: React.MouseEvent) => void;
-  dragStartInfo: DragStartInfo | null;
 }
 
-export default function GantTask({
-  task,
-  index,
-  handleMouseDown,
-  dragStartInfo,
-}: GantTaskProps) {
+export default function GantTask({ task, index }: GantTaskProps) {
   const HOUR_WIDTH_PX = 70; // Pixels per hour
   const START_HOUR_DISPLAY = 7; // Start time for the visible grid (7 AM)
 
-  const isActive = dragStartInfo?.taskId === task.id?.toString();
+  const { attributes, listeners, setNodeRef, transform } = useDraggable({
+    id: task.id,
+  });
+
+  const style = {
+    left: `${
+      (task.startTime.getHours() - START_HOUR_DISPLAY) * HOUR_WIDTH_PX
+    }px`,
+    width: (task.Duration / 60) * HOUR_WIDTH_PX,
+    top: `${index * 40 + 10}px`,
+    transform: transform
+      ? `translate3d(${transform.x}px, ${transform.y}px, 0, ${transform.y}px, 0)`
+      : undefined,
+  };
 
   return (
     <div
       data-task-id={task.id}
+      ref={setNodeRef}
+      {...listeners}
+      {...attributes}
       className={`absolute h-8 rounded select-none active:cursor-grabbing flex items-center
-              justify-between px-2 text-white font-medium bg-blue-500`}
-      style={{
-        left: `${
-          (task.startTime.getHours() - START_HOUR_DISPLAY) * HOUR_WIDTH_PX
-        }px`,
-        width: (task.Duration / 60) * HOUR_WIDTH_PX,
-        top: `${index * 40 + 10}px`,
-        transition: isActive ? "none" : "transform 0.2s ease",
-      }}
-      onMouseDown={handleMouseDown}
+                justify-between px-2 text-white font-medium bg-blue-500`}
+      style={style}
     >
       <span className="truncate pointer-events-none select-none">
         {task.name}

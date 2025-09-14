@@ -1,8 +1,19 @@
-import { closestCenter, DndContext, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
+import {
+  closestCenter,
+  DndContext,
+  DragEndEvent,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
 import { TaskDB } from "../../types";
 import TaskItem from "./TaskItem";
 import CreateTaskButton from "./createTaskButton";
-import { arrayMove, SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
+import {
+  arrayMove,
+  SortableContext,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
 
 interface TaskListProps {
   tasks: TaskDB[];
@@ -15,22 +26,19 @@ export default function TaskList({
   setTasks,
   currentDate,
 }: TaskListProps) {
+  const sensors = useSensors(useSensor(PointerSensor));
 
-  const sensors = useSensors(
-    useSensor(PointerSensor)
-  )
+  function handleDragEnd(event: DragEndEvent) {
+    const { active, over } = event;
 
-  function handleDragEnd(event) {
-    const {active, over} = event
-
-    if(active.id !== over.id) {
+    if (active.id !== over?.id) {
       setTasks((prevTasks) => {
-        const oldIndex = prevTasks.findIndex((t) => t.id == active.id)
-        const newIndex = prevTasks.findIndex((t) => t.id == over.id)
+        const oldIndex = prevTasks.findIndex((t) => t.id == active.id);
+        const newIndex = prevTasks.findIndex((t) => t.id == over?.id);
         const move = arrayMove(prevTasks, oldIndex, newIndex);
 
         return move;
-      })
+      });
     }
   }
 
@@ -48,7 +56,7 @@ export default function TaskList({
           onDragEnd={handleDragEnd}
         >
           <SortableContext
-            items={tasks.map(t => t.id)}
+            items={tasks.map((t) => t.id)}
             strategy={verticalListSortingStrategy}
           >
             {tasks.map((task, index) => (

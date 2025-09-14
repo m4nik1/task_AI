@@ -1,26 +1,21 @@
 "use client";
 
-import { useState, RefObject, SetStateAction } from "react";
+import { RefObject, SetStateAction } from "react";
 import { TaskDB } from "../../types";
-import { getHourFromX, getXFromHour } from "@/lib/utils";
+import { getXFromHour } from "@/lib/utils";
 import GantTask from "./gantTask";
 import DateNavigation from "./DateNavigation";
-interface DragStartInfo {
-  startX: number;
-  startHour: number;
-  taskId: string | null;
-  isResizing: boolean;
-  initialDuration?: number;
-  initialStartHour?: number;
-}
+import {
+  DndContext,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
 
 interface gantGridProps {
   setTasks: React.Dispatch<SetStateAction<TaskDB[]>>;
   tasks: TaskDB[];
   gridRef: RefObject<HTMLDivElement>;
-  handleMouseDown: (e: React.MouseEvent) => void;
-  dragStartInfo: DragStartInfo | null;
-  draggedTask: string | null;
   navigateDate: (direction: number) => void;
   currentDate: Date;
 }
@@ -28,9 +23,6 @@ interface gantGridProps {
 export default function GantGrid({
   setTasks,
   tasks,
-  gridRef,
-  handleMouseDown,
-  dragStartInfo,
   navigateDate,
   currentDate,
 }: gantGridProps) {
@@ -61,28 +53,30 @@ export default function GantGrid({
     START_HOUR_DISPLAY
   );
 
-  function gridDrop(e: React.DragEvent<HTMLDivElement>) {
-    e.preventDefault();
-    if (draggedTaskState) {
-      const dropHour = getHourFromX(
-        e.clientX,
-        gridRef,
-        HOUR_WIDTH_PX,
-        START_HOUR_DISPLAY
-      );
-      setTasks((prevTasks) =>
-        prevTasks
-          .filter((t) => !!!t.id)
-          .map((task) =>
-            task.id?.toString() === draggedTaskState
-              ? { ...task, startHour: dropHour }
-              : task
-          )
-      );
-      setDraggedTaskState(null);
-    }
+  const sensors = useSensors(useSensor(PointerSensor));
+
+  function handleDragEnd({ active, delta }: any) {
+    const taskId = active.id;
+    console.log("Dropped: ", active.id, delta);
+
+    const minutesPerPx = 60 / HOUR_WIDTH_PX;
+
+    const deltaMinutes = delta.x * minutesPerPx;
+
+    const snappedMinutes = Math.round(deltaMinutes / 15) * 15;
+
+    setTasks((prevTasks) =>
+      prevTasks.map((t) => {
+        if (t.id !== taskId) return t;
+
+        const newStart = new Date(t.startTime.getTime());
+
+        newStart.setMinutes(newStart.getMinutes() + snappedMinutes);
+
+        return { ...t, startTime: newStart };
+      })
+    );
   }
-  const [draggedTaskState, setDraggedTaskState] = useState<string | null>(null);
 
   return (
     <div className="flex-1 flex flex-col bg-white overflow-hidden">
@@ -110,57 +104,30 @@ export default function GantGrid({
       </div>
 
       {/* Main Grid With tasks */}
-      <div
-        ref={gridRef}
-        className="flex-1 relative overflow-auto bg-white"
-        // onMouseDown={handleMouseDown}
-        onDragOver={(e) => {
-          e.preventDefault();
-          e.dataTransfer.dropEffect = "move";
-        }}
-        onDrop={(e) => gridDrop(e)}
-        style={{
-          minWidth: `${TOTAL_DISPLAY_HOURS * HOUR_WIDTH_PX}px`,
-          backgroundSize: `${HOUR_WIDTH_PX}px 100%`,
-          backgroundImage: `linear-gradient(to right, #f3f4f6 1px, transparent 1px)`,
-        }}
-      >
-        <style jsx>{`
-          .dark .flex-1.relative {
-            background-image: linear-gradient(
-              to rigt,
-              #374151 1px,
-              transparent 1px
-            );
-          }
-        `}</style>
-        {tasks
-          .filter((t) => t.id)
-          .map((task, index) => (
-            <GantTask
-              key={index}
-              task={task}
-              index={index}
-              handleMouseDown={handleMouseDown}
-              dragStartInfo={dragStartInfo}
-            />
+      <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
+        <div className="flex-1 relative overflow-auto bg-white">
+          {tasks
+            .filter((t) => t.id)
+            .map((task, index) => (
+              <GantTask key={task.id} task={task} index={index} />
+            ))}
+
+          {Array.from({ length: tasks.length + 10 }, (_, i) => (
+            <div
+              key={i}
+              className="absolute left-0 right-0 border-b border-gray-100"
+              style={{ top: `${i * 40 + 40}px` }}
+            ></div>
           ))}
 
-        {Array.from({ length: tasks.length + 10 }, (_, i) => (
           <div
-            key={i}
-            className="absolute left-0 right-0 border-b border-gray-100"
-            style={{ top: `${i * 40 + 40}px` }}
-          ></div>
-        ))}
-
-        <div
-          className="absolute top-0 bottom-0 w-0.5 bg-red-500 z-10"
-          style={{ left: currentTimeLinePos }}
-        >
-          <div className="absolute -top-1 -left-1.5 w-3 h-3 bg-red-500 rounded-full"></div>
+            className="absolute top-0 bottom-0 w-0.5 bg-red-500 z-10"
+            style={{ left: currentTimeLinePos }}
+          >
+            <div className="absolute -top-1 -left-1.5 w-3 h-3 bg-red-500 rounded-full"></div>
+          </div>
         </div>
-      </div>
+      </DndContext>
     </div>
   );
 }
