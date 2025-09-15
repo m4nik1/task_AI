@@ -33,17 +33,17 @@ export default async function HomePage() {
     },
   ];
 
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
+  // const session = await auth.api.getSession({
+  //   headers: await headers(),
+  // });
 
-  if (!session) {
-    console.log(session);
-    return <div>Not Authenticated</div>;
-  } else {
-    console.log("Authenticated: ", session);
-    return <HomePageClient taskDB={tasks} />;
-  }
+  // if (!session) {
+  //   console.log(session);
+  //   return <div>Not Authenticated</div>;
+  // } else {
+  // console.log("Authenticated: ", session);
+  return <HomePageClient taskDB={tasks} />;
+  // }
 
   // const tasks = await prisma.userTasks.findMany({
   //   where: {

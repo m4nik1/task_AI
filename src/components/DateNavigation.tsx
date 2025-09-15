@@ -1,4 +1,7 @@
+"use client";
+
 import { formatDate } from "@/lib/utils";
+import { useState, useEffect } from "react";
 
 interface DateNavigationProps {
   currentDate: Date;
@@ -9,6 +12,13 @@ export default function DateNavigation({
   currentDate,
   navigateDate,
 }: DateNavigationProps) {
+  const [nextDayDate, setNextDayDate] = useState<string>("");
+
+  useEffect(() => {
+    const nextDay = new Date(currentDate.getTime() + 24 * 60 * 60 * 1000);
+    setNextDayDate(formatDate(nextDay));
+  }, [currentDate]);
+
   return (
     <div className="flex items-center justify-between px-4 py-3 border-b bg-gray-50">
       <div className="items-center gap-2">
@@ -63,7 +73,7 @@ export default function DateNavigation({
         </button>
       </div>
       <div className="text-sm text-gray-600 transition-all duration-300 ease-in-out">
-        {formatDate(new Date(currentDate.getTime() + 24 * 60 * 60 * 1000))}
+        {nextDayDate}
       </div>
     </div>
   );

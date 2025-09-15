@@ -1,6 +1,6 @@
 "use client";
 
-import { RefObject, SetStateAction } from "react";
+import { SetStateAction } from "react";
 import { TaskDB } from "../../types";
 import { getXFromHour } from "@/lib/utils";
 import GantTask from "./gantTask";
@@ -11,11 +11,11 @@ import {
   useSensor,
   useSensors,
 } from "@dnd-kit/core";
+import { restrictToHorizontalAxis } from "@dnd-kit/modifiers";
 
 interface gantGridProps {
   setTasks: React.Dispatch<SetStateAction<TaskDB[]>>;
   tasks: TaskDB[];
-  gridRef: RefObject<HTMLDivElement>;
   navigateDate: (direction: number) => void;
   currentDate: Date;
 }
@@ -74,7 +74,7 @@ export default function GantGrid({
         newStart.setMinutes(newStart.getMinutes() + snappedMinutes);
 
         return { ...t, startTime: newStart };
-      })
+      }),
     );
   }
 
@@ -104,10 +104,14 @@ export default function GantGrid({
       </div>
 
       {/* Main Grid With tasks */}
-      <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
+      <DndContext
+        sensors={sensors}
+        onDragEnd={handleDragEnd}
+        modifiers={[restrictToHorizontalAxis]}
+      >
         <div className="flex-1 relative overflow-auto bg-white">
           {tasks
-            .filter((t) => t.id)
+            // .filter((t) => t.id)
             .map((task, index) => (
               <GantTask key={task.id} task={task} index={index} />
             ))}
@@ -120,6 +124,7 @@ export default function GantGrid({
             ></div>
           ))}
 
+          {/* Horizontal red line to show current time */}
           <div
             className="absolute top-0 bottom-0 w-0.5 bg-red-500 z-10"
             style={{ left: currentTimeLinePos }}

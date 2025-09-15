@@ -10,26 +10,16 @@ interface HomeProps {
 }
 
 export default function HomePageClient({ taskDB }: HomeProps) {
-  // Constants for Gantt chart scaling
-  const [currentDate, setCurrentDate] = useState(new Date());
+  const [currentDate, setCurrentDate] = useState<Date | null>(null);
+  const [isClient, setIsClient] = useState(false);
 
   const [tasks, setTasks] = useState<TaskDB[]>(taskDB);
   const [currentTasks, setCurrentTasks] = useState<TaskDB[]>([]);
 
-  // const {
-  //   isDragging,
-  //   dragStartInfo,
-  //   tempTask,
-  //   handleMouseUp,
-  //   handleMouseDown,
-  // } = useGanttDrag({
-  //   currentTasks,
-  //   setCurrentTasks,
-  //   gridRef,
-  //   HOUR_WIDTH_PX,
-  //   START_HOUR_DISPLAY,
-  //   END_HOUR_DISPLAY,
-  // });
+  useEffect(() => {
+    setCurrentDate(new Date());
+    setIsClient(true);
+  }, []);
 
   function checkingDates(date1: Date, date2: Date) {
     return (
@@ -37,11 +27,12 @@ export default function HomePageClient({ taskDB }: HomeProps) {
     );
   }
 
-  const tasksForDate = tasks.filter((t) =>
-    checkingDates(new Date(t.startTime), currentDate)
-  );
+  const tasksForDate = currentDate
+    ? tasks.filter((t) => checkingDates(new Date(t.startTime), currentDate))
+    : [];
 
   const navigateDate = (direction: number) => {
+    if (!currentDate) return;
     const newDate = new Date(currentDate);
     newDate.setDate(currentDate.getDate() + direction);
     console.log("Tasks are filtered by date: ", currentTasks);
@@ -49,8 +40,18 @@ export default function HomePageClient({ taskDB }: HomeProps) {
   };
 
   useEffect(() => {
-    setCurrentTasks(tasksForDate);
+    if (currentDate) {
+      setCurrentTasks(tasksForDate);
+    }
   }, [currentDate]);
+
+  if (!isClient || !currentDate) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <div className="text-lg">Loading...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex h-screen">

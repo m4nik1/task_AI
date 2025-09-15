@@ -1,8 +1,8 @@
 "use client";
 import { Button } from "./ui/button";
 import { Calendar } from "lucide-react";
-import Link from "next/link";
-import { useState, useEffect } from "react";
+// import Link from "next/link";
+// import { useState, useEffect } from "react";
 
 export default function Navbar() {
   const viewOptions = ["Day"];
@@ -11,18 +11,19 @@ export default function Navbar() {
   // const session = await auth.api.getSession({
   //   headers: await headers(),
   // });
-  const [userSession, setSession] = useState(null);
+  // const [userSession, setSession] = useState(null);
+  // const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    async function getSession() {
-      const session = await fetch("/api/checkSession", { method: "GET" });
-      const resData = await session.json();
-      console.log("res data: ", resData.data);
-      setSession(resData.data);
-      console.log("user session status: ", userSession);
-    }
-    getSession();
-  }, [setSession]);
+  // useEffect(() => {
+  //   async function getSession() {
+  //     const session = await fetch("/api/checkSession", { method: "GET" });
+  //     const resData = await session.json();
+  //     console.log("res data: ", resData.data);
+  //     setSession(resData.data);
+  //     console.log("user session status: ", userSession);
+  //   }
+  //   getSession();
+  // }, [setSession]);
 
   function signOut() {
     console.log("Signing out");
@@ -30,7 +31,7 @@ export default function Navbar() {
 
   return (
     <div
-      className="bg-white dark-gray-900 border-b border-gray-200 
+      className="bg-white dark-gray-900 border-b border-gray-200
     dark:border px-6 py-4 flex justify-between"
     >
       <div className="flex items-center gap-4">
@@ -44,7 +45,7 @@ export default function Navbar() {
 
       <div className="flex items-center gap-4">
         <div
-          className="gap-1 bg-gray-100 dark:bg-gray-800 
+          className="gap-1 bg-gray-100 dark:bg-gray-800
           rounded-lg p-1 shadow-inner"
         >
           {viewOptions.map((view, index) => (
@@ -58,13 +59,13 @@ export default function Navbar() {
             </Button>
           ))}
         </div>
-        {!userSession ? (
-          <Button>
+        {/*{!userSession ? (*/}
+        {/*<Button>
             <Link href="/signIn">Sign In</Link>
           </Button>
-        ) : (
-          <Button onClick={signOut}>Sign Out</Button>
-        )}
+        ) : (*/}
+        <Button onClick={signOut}>Sign Out</Button>
+        {/*)}*/}
       </div>
     </div>
   );
