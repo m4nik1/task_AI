@@ -18,7 +18,7 @@ export default function GantTask({ task, index }: GantTaskProps) {
     left: `${
       (task.startTime.getHours() - START_HOUR_DISPLAY) * HOUR_WIDTH_PX
     }px`,
-    width: (task.Duration / 60) * HOUR_WIDTH_PX,
+    // width: (task.Duration / 60) * HOUR_WIDTH_PX,
     top: `${index * 40 + 10}px`,
     transform: transform
       ? `translate3d(${transform.x}px, ${transform.y}px, 0)`

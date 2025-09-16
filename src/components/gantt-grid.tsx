@@ -67,14 +67,16 @@ export default function GantGrid({
 
     setTasks((prevTasks) =>
       prevTasks.map((t) => {
-        if (t.id !== taskId) return t;
+        if (t.id.toString() !== taskId) return t;
 
         const newStart = new Date(t.startTime.getTime());
 
         newStart.setMinutes(newStart.getMinutes() + snappedMinutes);
 
+        console.log("New start: ", newStart);
+
         return { ...t, startTime: newStart };
-      }),
+      })
     );
   }
 
@@ -104,35 +106,52 @@ export default function GantGrid({
       </div>
 
       {/* Main Grid With tasks */}
-      <DndContext
-        sensors={sensors}
-        onDragEnd={handleDragEnd}
-        modifiers={[restrictToHorizontalAxis]}
+
+      <div
+        className="flex-1 relative overflow-auto bg-white"
+        style={{
+          minWidth: `${TOTAL_DISPLAY_HOURS * HOUR_WIDTH_PX}px`,
+          backgroundSize: `${HOUR_WIDTH_PX}px 100%`,
+          backgroundImage: `linear-gradient(to right, #f3f4f6 1px, transparent 1px)`,
+        }}
       >
-        <div className="flex-1 relative overflow-auto bg-white">
+        <style jsx>{`
+          .dark .flex-1.relative {
+            background-image: linear-gradient(
+              to rigt,
+              #374151 1px,
+              transparent 1px
+            );
+          }
+        `}</style>
+        <DndContext
+          sensors={sensors}
+          onDragEnd={handleDragEnd}
+          modifiers={[restrictToHorizontalAxis]}
+        >
           {tasks
             // .filter((t) => t.id)
             .map((task, index) => (
               <GantTask key={task.id} task={task} index={index} />
             ))}
+        </DndContext>
 
-          {Array.from({ length: tasks.length + 10 }, (_, i) => (
-            <div
-              key={i}
-              className="absolute left-0 right-0 border-b border-gray-100"
-              style={{ top: `${i * 40 + 40}px` }}
-            ></div>
-          ))}
-
-          {/* Horizontal red line to show current time */}
+        {Array.from({ length: tasks.length + 10 }, (_, i) => (
           <div
-            className="absolute top-0 bottom-0 w-0.5 bg-red-500 z-10"
-            style={{ left: currentTimeLinePos }}
-          >
-            <div className="absolute -top-1 -left-1.5 w-3 h-3 bg-red-500 rounded-full"></div>
-          </div>
+            key={i}
+            className="absolute left-0 right-0 border-b border-gray-100"
+            style={{ top: `${i * 40 + 40}px` }}
+          ></div>
+        ))}
+
+        {/* Horizontal red line to show current time */}
+        <div
+          className="absolute top-0 bottom-0 w-0.5 bg-red-500 z-10"
+          style={{ left: currentTimeLinePos }}
+        >
+          <div className="absolute -top-1 -left-1.5 w-3 h-3 bg-red-500 rounded-full"></div>
         </div>
-      </DndContext>
+      </div>
     </div>
   );
 }
