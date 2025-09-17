@@ -1,6 +1,6 @@
 "use client";
 
-import { SetStateAction } from "react";
+import { SetStateAction, use, useMemo } from "react";
 import { TaskDB } from "../../types";
 import { getXFromHour } from "@/lib/utils";
 import GantTask from "./gantTask";
@@ -11,7 +11,10 @@ import {
   useSensor,
   useSensors,
 } from "@dnd-kit/core";
-import { restrictToHorizontalAxis } from "@dnd-kit/modifiers";
+import {
+  restrictToHorizontalAxis,
+  createSnapModifier,
+} from "@dnd-kit/modifiers";
 
 interface gantGridProps {
   setTasks: React.Dispatch<SetStateAction<TaskDB[]>>;
@@ -50,16 +53,18 @@ export default function GantGrid({
   const currentTimeLinePos = getXFromHour(
     currentHourInDay,
     HOUR_WIDTH_PX,
-    START_HOUR_DISPLAY
+    START_HOUR_DISPLAY,
   );
 
   const sensors = useSensors(useSensor(PointerSensor));
+
+  const snapToGrid = createSnapModifier(HOUR_WIDTH_PX / 2);
 
   function handleDragEnd({ active, delta }: any) {
     const taskId = active.id;
     console.log("Dropped: ", active.id, delta);
 
-    const minutesPerPx = 60 / HOUR_WIDTH_PX;
+    const minutesPerPx = 60 / (HOUR_WIDTH_PX / 2);
 
     const deltaMinutes = delta.x * minutesPerPx;
 
@@ -76,7 +81,7 @@ export default function GantGrid({
         console.log("New start: ", newStart);
 
         return { ...t, startTime: newStart };
-      })
+      }),
     );
   }
 
@@ -127,7 +132,7 @@ export default function GantGrid({
         <DndContext
           sensors={sensors}
           onDragEnd={handleDragEnd}
-          modifiers={[restrictToHorizontalAxis]}
+          modifiers={[restrictToHorizontalAxis, snapToGrid]} // snapToGrid({ x: 35, y: 40 })
         >
           {tasks
             // .filter((t) => t.id)
