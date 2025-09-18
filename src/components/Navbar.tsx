@@ -31,7 +31,7 @@ export default function Navbar() {
 
   return (
     <div
-      className="bg-white dark-gray-900 border-b border-gray-200
+      className="dark:bg-black dark-gray-900 border-b border-gray-200
     dark:border px-6 py-4 flex justify-between"
     >
       <div className="flex items-center gap-4">
@@ -39,11 +39,13 @@ export default function Navbar() {
           <Calendar className="w-5 h-5 text-white"></Calendar>
         </div>
         <div>
-          <h1 className="text-xl font-bold text-gray-900">Task AI</h1>
+          <h1 className="text-xl font-bold text-gray-900 dark:text-white">
+            Task AI
+          </h1>
         </div>
       </div>
 
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-4 dark:bg-black">
         <div
           className="gap-1 bg-gray-100 dark:bg-gray-800
           rounded-lg p-1 shadow-inner"

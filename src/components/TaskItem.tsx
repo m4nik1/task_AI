@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { useRef, useState } from "react";
 import { TaskDB } from "../../types";
@@ -19,23 +19,18 @@ export default function TaskItem({
   tasks,
   index,
   setTasks,
-  id
+  id,
 }: TaskItemProps) {
   const [completeCheck, setCheck] = useState(false);
   const taskName = useRef<HTMLInputElement>(null);
 
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition
-  } = useSortable({ id: task.id })
+  const { attributes, listeners, setNodeRef, transform, transition } =
+    useSortable({ id: task.id });
 
   const style = {
     transform: CSS.Transform.toString(transform),
-    transition
-  }
+    transition,
+  };
 
   function taskComplete(complete: boolean) {
     const newTasks = [...tasks];
@@ -46,7 +41,7 @@ export default function TaskItem({
 
   // Add update change to DB to fix the name of the task
   async function confirmTask(
-    e: React.KeyboardEvent<HTMLInputElement> | undefined
+    e: React.KeyboardEvent<HTMLInputElement> | undefined,
   ) {
     if (e?.code == "Enter") {
       try {
@@ -96,7 +91,7 @@ export default function TaskItem({
       {...listeners}
       className="flex items-center gap-3 px-4 cursor-move
             border-b border-gray-250 hover:bg-gray-50"
-      style={{...style, height: "40px" }}
+      style={{ ...style, height: "40px" }}
     >
       <input
         type="checkbox"
@@ -106,7 +101,7 @@ export default function TaskItem({
       />
       <div className="flex-grow min-w-0">
         <input
-          className={`text-sm font-medium text-gray-900 truncate ${
+          className={`text-sm font-medium text-gray-900 dark:text-white truncate ${
             completeCheck ? "line-through" : ""
           }`}
           onKeyDown={confirmTask}

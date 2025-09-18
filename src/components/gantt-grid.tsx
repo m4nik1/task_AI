@@ -58,13 +58,13 @@ export default function GantGrid({
 
   const sensors = useSensors(useSensor(PointerSensor));
 
-  const snapToGrid = createSnapModifier(HOUR_WIDTH_PX / 2);
+  const snapToGrid = createSnapModifier(HOUR_WIDTH_PX);
 
   function handleDragEnd({ active, delta }: any) {
     const taskId = active.id;
     console.log("Dropped: ", active.id, delta);
 
-    const minutesPerPx = 60 / (HOUR_WIDTH_PX / 2);
+    const minutesPerPx = 60 / HOUR_WIDTH_PX;
 
     const deltaMinutes = delta.x * minutesPerPx;
 
@@ -75,7 +75,7 @@ export default function GantGrid({
         if (t.id.toString() !== taskId) return t;
 
         const newStart = new Date(t.startTime.getTime());
-
+        console.log("Snapped minutes: ", snappedMinutes);
         newStart.setMinutes(newStart.getMinutes() + snappedMinutes);
 
         console.log("New start: ", newStart);
@@ -86,12 +86,12 @@ export default function GantGrid({
   }
 
   return (
-    <div className="flex-1 flex flex-col bg-white overflow-hidden">
+    <div className="flex-1 flex flex-col dark:bg-black overflow-hidden">
       {/* Date Navi */}
       <DateNavigation currentDate={currentDate} navigateDate={navigateDate} />
 
       {/* Time Labels */}
-      <div className="flex border-b border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-800">
+      <div className="flex border-b border-gray-200 dark:border-white bg-gray-50">
         <div
           className="flex-1 grid"
           style={{
@@ -102,7 +102,7 @@ export default function GantGrid({
           {timeLabels.map((label, index) => (
             <div
               key={index}
-              className="text-xs text-center text-gray-600 font-medium py-2 border-b"
+              className="text-xs text-center text-white-600 font-medium py-2 border-b"
             >
               {label}
             </div>
@@ -113,7 +113,7 @@ export default function GantGrid({
       {/* Main Grid With tasks */}
 
       <div
-        className="flex-1 relative overflow-auto bg-white"
+        className="flex-1 relative overflow-auto dark:bg-black"
         style={{
           minWidth: `${TOTAL_DISPLAY_HOURS * HOUR_WIDTH_PX}px`,
           backgroundSize: `${HOUR_WIDTH_PX}px 100%`,
@@ -144,7 +144,7 @@ export default function GantGrid({
         {Array.from({ length: tasks.length + 10 }, (_, i) => (
           <div
             key={i}
-            className="absolute left-0 right-0 border-b border-gray-100"
+            className="absolute left-0 right-0 border-b border-gray-500"
             style={{ top: `${i * 40 + 40}px` }}
           ></div>
         ))}

@@ -54,8 +54,8 @@ export default function HomePageClient({ taskDB }: HomeProps) {
   }
 
   return (
-    <div className="flex h-screen">
-      <div className="flex-1 flex bg-gray-50">
+    <div className="flex h-screen dark:bg-black dark:text-gray-100">
+      <div className="flex-1 flex bg-gray-50 dark:bg-gray-900">
         <TaskList tasks={tasks} setTasks={setTasks} currentDate={currentDate} />
 
         <GantGrid
