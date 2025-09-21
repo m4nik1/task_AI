@@ -31,7 +31,7 @@ export default function Navbar() {
 
   return (
     <div
-      className="dark:bg-black dark-gray-900 border-b border-gray-200
+      className="dark:bg-[#1f1f1f] dark-gray-900 border-b border-gray-200
     dark:border px-6 py-4 flex justify-between"
     >
       <div className="flex items-center gap-4">
@@ -45,9 +45,9 @@ export default function Navbar() {
         </div>
       </div>
 
-      <div className="flex items-center gap-4 dark:bg-black">
+      <div className="flex items-center gap-4 dark:bg-[#1f1f1f]">
         <div
-          className="gap-1 bg-gray-100 dark:bg-gray-800
+          className="gap-1 dark:bg-[#1f1f1f]
           rounded-lg p-1 shadow-inner"
         >
           {viewOptions.map((view, index) => (

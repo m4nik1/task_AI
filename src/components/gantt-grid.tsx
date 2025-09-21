@@ -86,12 +86,12 @@ export default function GantGrid({
   }
 
   return (
-    <div className="flex-1 flex flex-col dark:bg-black overflow-hidden">
+    <div className="flex-1 flex flex-col dark:bg-[#1f1f1f] overflow-hidden">
       {/* Date Navi */}
       <DateNavigation currentDate={currentDate} navigateDate={navigateDate} />
 
       {/* Time Labels */}
-      <div className="flex border-b border-gray-200 dark:border-white bg-gray-50">
+      <div className="flex border-b border-gray-200 dark:border-white dark:bg-[#1f1f1f]">
         <div
           className="flex-1 grid"
           style={{
@@ -113,7 +113,7 @@ export default function GantGrid({
       {/* Main Grid With tasks */}
 
       <div
-        className="flex-1 relative overflow-auto dark:bg-black"
+        className="flex-1 relative overflow-auto dark:bg-[#1f1f1f]"
         style={{
           minWidth: `${TOTAL_DISPLAY_HOURS * HOUR_WIDTH_PX}px`,
           backgroundSize: `${HOUR_WIDTH_PX}px 100%`,
@@ -145,7 +145,7 @@ export default function GantGrid({
           <div
             key={i}
             className="absolute left-0 right-0 border-b border-gray-500"
-            style={{ top: `${i * 40 + 40}px` }}
+            style={{ top: `${i * 40 + 40}px`, bottom: "1px solid #5f6368" }}
           ></div>
         ))}
 

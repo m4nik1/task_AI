@@ -20,9 +20,9 @@ export default function DateNavigation({
   }, [currentDate]);
 
   return (
-    <div className="flex items-center justify-between px-4 py-3 border-b bg-gray-50">
+    <div className="flex items-center justify-between px-4 py-3 border-b dark:bg-[#1f1f1f]">
       <div className="items-center gap-2">
-        <div className="bg-black text-white px-2 py-1 rounded text-sm font-medium ease-out">
+        <div className="dark:bg-[#1f1f1f] text-white px-2 py-1 rounded text-sm font-medium ease-out">
           {formatDate(currentDate)}
         </div>
         <button className="p-1 hover-bg-gray-200 rounded">
