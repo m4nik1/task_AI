@@ -91,7 +91,7 @@ export default function GantGrid({
       <DateNavigation currentDate={currentDate} navigateDate={navigateDate} />
 
       {/* Time Labels */}
-      <div className="flex border-b border-gray-200 dark:border-white dark:bg-[#1f1f1f]">
+      <div className="flex border-b border-gray-200 dark:bg-[#1f1f1f]">
         <div
           className="flex-1 grid"
           style={{
@@ -117,14 +117,14 @@ export default function GantGrid({
         style={{
           minWidth: `${TOTAL_DISPLAY_HOURS * HOUR_WIDTH_PX}px`,
           backgroundSize: `${HOUR_WIDTH_PX}px 100%`,
-          backgroundImage: `linear-gradient(to right, #f3f4f6 1px, transparent 1px)`,
+          backgroundImage: `linear-gradient(to right, #3a3a3a 1px, transparent 1px)`,
         }}
       >
         <style jsx>{`
           .dark .flex-1.relative {
             background-image: linear-gradient(
               to rigt,
-              #374151 1px,
+              #3a3a3a 1px,
               transparent 1px
             );
           }
@@ -144,8 +144,8 @@ export default function GantGrid({
         {Array.from({ length: tasks.length + 10 }, (_, i) => (
           <div
             key={i}
-            className="absolute left-0 right-0 border-b border-gray-500"
-            style={{ top: `${i * 40 + 40}px`, bottom: "1px solid #5f6368" }}
+            className="absolute left-0 right-0 border-b border-gray-700"
+            style={{ top: `${i * 40 + 40}px` }}
           ></div>
         ))}
 

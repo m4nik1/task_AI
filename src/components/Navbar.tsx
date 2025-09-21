@@ -31,12 +31,12 @@ export default function Navbar() {
 
   return (
     <div
-      className="dark:bg-[#1f1f1f] dark-gray-900 border-b border-gray-200
-    dark:border px-6 py-4 flex justify-between"
+      className="dark:bg-[#1f1f1f] dark-gray-900 border-b border-gray-700
+    dark:border-gray-700 px-6 py-4 flex justify-between"
     >
       <div className="flex items-center gap-4">
         <div className="w-10 h-10 rounded-lg flex items-center justify-center">
-          <Calendar className="w-5 h-5 text-white"></Calendar>
+          <Calendar className="w-5 h-5 text-gray-700"></Calendar>
         </div>
         <div>
           <h1 className="text-xl font-bold text-gray-900 dark:text-white">
