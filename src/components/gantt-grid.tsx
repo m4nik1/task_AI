@@ -117,15 +117,42 @@ export default function GantGrid({
         style={{
           minWidth: `${TOTAL_DISPLAY_HOURS * HOUR_WIDTH_PX}px`,
           backgroundSize: `${HOUR_WIDTH_PX}px 100%`,
-          backgroundImage: `linear-gradient(to right, #3a3a3a 1px, transparent 1px)`,
+          backgroundImage: `
+            /* vertical hour lines */
+            repeating-linear-gradient(
+              to right,
+              #3a3a3a,
+              #3a3a3a 1px,
+              transparent 1px,
+              transparent ${HOUR_WIDTH_PX}px
+            ),
+            /* horizontal row lines every 40px to match task rows */
+            repeating-linear-gradient(
+              to bottom,
+              #424242,
+              #424242 1px,
+              transparent 1px,
+              transparent 40px
+            )
+          `,
         }}
       >
         <style jsx>{`
+          /* Making sure the dark override applies */
           .dark .flex-1.relative {
-            background-image: linear-gradient(
-              to rigt,
+            background-image: repeating-linear-gradient(
+              to right,
+              #3a3a3a
               #3a3a3a 1px,
               transparent 1px
+              transparent ${HOUR_WIDTH_PX}px
+            ),
+            repeating-linear-gradient (
+              to bottom,
+              #424242
+              #424242 1px,
+              transparent 1px,
+              transparent 40px
             );
           }
         `}</style>
@@ -141,13 +168,13 @@ export default function GantGrid({
             ))}
         </DndContext>
 
-        {Array.from({ length: tasks.length + 10 }, (_, i) => (
+        {/* {Array.from({ length: tasks.length + 10 }, (_, i) => (
           <div
             key={i}
             className="absolute left-0 right-0 border-b border-gray-700"
             style={{ top: `${i * 40 + 40}px` }}
           ></div>
-        ))}
+        ))} */}
 
         {/* Horizontal red line to show current time */}
         <div

@@ -90,7 +90,7 @@ export default function TaskItem({
       {...attributes}
       {...listeners}
       className="flex items-center gap-3 px-4 cursor-move
-            border-b border-gray-250 hover:bg-gray-50"
+            border-b border-gray-250 hover:bg-gray-100 dark:hover:bg-white/50"
       style={{ ...style, height: "40px" }}
     >
       <input

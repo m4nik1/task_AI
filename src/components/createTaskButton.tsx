@@ -19,8 +19,8 @@ export default function CreateTaskButton({
       Duration: 60, // Default duration
       EndTime: currentDate,
     };
-    console.log("Making a new task, ");
-    setTasks((prevTasks) => [...prevTasks, newTask]);
+    console.log("Making a new task, ", newTask);
+    // setTasks((prevTasks) => [...prevTasks, newTask]);
   }
 
   return (
