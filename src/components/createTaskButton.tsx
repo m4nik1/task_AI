@@ -13,14 +13,23 @@ export default function CreateTaskButton({
 }: CreateTaskProps) {
   async function createNewTask() {
     const newTask: TaskDB = {
-      name: "",
+      id: -1,
+      name: "New Task",
       startTime: currentDate,
       status: "Scheduled",
       Duration: 60, // Default duration
       EndTime: currentDate,
     };
-    console.log("Making a new task, ", newTask);
-    // setTasks((prevTasks) => [...prevTasks, newTask]);
+
+    const res = await fetch("/api/addTask", {
+      method: "POST",
+      body: JSON.stringify(newTask)
+    })
+
+    const taskID = await res.json()
+
+    newTask.id = taskID.data
+    setTasks((prevTasks) => [...prevTasks, newTask]);
   }
 
   return (

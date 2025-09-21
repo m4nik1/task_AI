@@ -50,7 +50,7 @@ export default function TaskItem({
         task.name = taskName.current?.value || "";
 
         // This fixes the default value being set for the task ID
-        const confirmedTask = await fetch("/api/addTask", {
+        const confirmedTask = await fetch("/api/updateTaskName", {
           method: "POST",
           body: JSON.stringify(task),
         });
