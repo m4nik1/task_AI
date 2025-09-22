@@ -22,7 +22,10 @@ export default function TaskItem({
   id,
 }: TaskItemProps) {
   const [completeCheck, setCheck] = useState(false);
+  const [inputFocus, setInputFocus] = useState(false)
+
   const taskName = useRef<HTMLInputElement>(null);
+
 
   const { attributes, listeners, setNodeRef, transform, transition } =
     useSortable({ id: task.id });
@@ -61,7 +64,6 @@ export default function TaskItem({
         task.id = taskID.data;
         newTasks.splice(index, 1, task);
         setTasks(newTasks);
-        console.log("tasks: ", tasks);
       } catch (err) {
         console.log("We have an error");
         console.error(err);
@@ -87,8 +89,9 @@ export default function TaskItem({
   return (
     <div
       ref={setNodeRef}
+      // { ...(inputFocus ? {} : { ...attributes, ...listeners }) }
       {...attributes}
-      {...listeners}
+      {...listeners }
       className="flex items-center gap-3 px-4 cursor-move
             border-b border-gray-250 hover:bg-gray-100 dark:hover:bg-white/50"
       style={{ ...style, height: "40px" }}
@@ -106,9 +109,9 @@ export default function TaskItem({
           }`}
           onKeyDown={confirmTask}
           placeholder="New Task"
-          defaultValue={task.name}
           ref={taskName}
         />
+
         <div className="flex items-center text-xs background-gray mt-0.5">
           <span>{formatTime(task.startTime.getHours())}</span>
           <span className="mx-1">-</span>
