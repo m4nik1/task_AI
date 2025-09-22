@@ -19,13 +19,10 @@ export default function TaskItem({
   tasks,
   index,
   setTasks,
-  id,
 }: TaskItemProps) {
   const [completeCheck, setCheck] = useState(false);
-  const [inputFocus, setInputFocus] = useState(false)
 
   const taskName = useRef<HTMLInputElement>(null);
-
 
   const { attributes, listeners, setNodeRef, transform, transition } =
     useSortable({ id: task.id });
@@ -44,12 +41,11 @@ export default function TaskItem({
 
   // Add update change to DB to fix the name of the task
   async function confirmTask(
-    e: React.KeyboardEvent<HTMLInputElement> | undefined,
+    e: React.KeyboardEvent<HTMLInputElement> | undefined
   ) {
     if (e?.code == "Enter") {
       try {
         const newTasks = [...tasks];
-        console.log(newTasks);
         task.name = taskName.current?.value || "";
 
         // This fixes the default value being set for the task ID
@@ -58,10 +54,9 @@ export default function TaskItem({
           body: JSON.stringify(task),
         });
 
-        const taskID = await confirmedTask.json();
+        const taskData = await confirmedTask.json();
 
-        console.log("Confirmed: ", taskID.data);
-        task.id = taskID.data;
+        console.log("Confirmed: ", taskData);
         newTasks.splice(index, 1, task);
         setTasks(newTasks);
       } catch (err) {
@@ -91,7 +86,7 @@ export default function TaskItem({
       ref={setNodeRef}
       // { ...(inputFocus ? {} : { ...attributes, ...listeners }) }
       {...attributes}
-      {...listeners }
+      {...listeners}
       className="flex items-center gap-3 px-4 cursor-move
             border-b border-gray-250 hover:bg-gray-100 dark:hover:bg-white/50"
       style={{ ...style, height: "40px" }}
@@ -110,6 +105,10 @@ export default function TaskItem({
           onKeyDown={confirmTask}
           placeholder="New Task"
           ref={taskName}
+          defaultValue={task.name}
+          onPointerDownCapture={(e) => e.stopPropagation()}
+          onMouseDownCapture={(e) => e.stopPropagation()}
+          onTouchStartCapture={(e) => e.stopPropagation()}
         />
 
         <div className="flex items-center text-xs background-gray mt-0.5">

@@ -1,5 +1,6 @@
 import { useDraggable } from "@dnd-kit/core";
 import { TaskDB } from "../../types";
+import { useEffect } from "react";
 
 interface GantTaskProps {
   task: TaskDB;
@@ -13,6 +14,10 @@ export default function GantTask({ task, index }: GantTaskProps) {
   const { attributes, listeners, setNodeRef, transform } = useDraggable({
     id: task.id.toString(),
   });
+
+  useEffect(() => {
+    console.log("Task ID: ", task.id);
+  }, []);
 
   const style = {
     left: `${

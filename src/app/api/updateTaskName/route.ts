@@ -13,7 +13,7 @@ export async function POST(req : NextRequest) {
         }
     })
 
-    console.log("Name is updated: ", reqData)
+    console.log("Name is updated: ", result)
 
-    return NextResponse.json({ message: "Task has been updated!" }, { status: 201 });
+    return NextResponse.json({ message: "Task Name has been updated!" }, { status: 201 });
 }
