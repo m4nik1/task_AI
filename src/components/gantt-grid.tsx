@@ -68,21 +68,67 @@ export default function GantGrid({
 
     const deltaMinutes = delta.x * minutesPerPx;
 
-    const snappedMinutes = Math.round(deltaMinutes / 15) * 15;
+    const snappedMinutes = Math.round(deltaMinutes / 30) * 30;
 
-    setTasks((prevTasks) =>
+
+    if(taskId.startsWith('resize-')) {
+      console.log('resizing now!')
+      const actualId = parseInt(taskId.replace('resize-', ''));
+
+      setTasks((prevTasks) => 
+        prevTasks.map((t) => {
+          if(t.id !== actualId) {
+            console.log('t.di: ', t.id)
+            console.log('taskId: ', taskId)
+            return t;
+          }
+  
+          const newDuration = Math.max(15, t.Duration + snappedMinutes);
+          const newEndTime = new Date(t.startTime.getTime())
+          newEndTime.setMinutes(newEndTime.getMinutes() + newDuration)
+
+
+          console.log("new duration: ", newDuration)
+  
+          return { ...t, Duration: newDuration, EndTime: newEndTime }
+        })
+      )
+    } else {
+        setTasks((prevTasks) =>
+          prevTasks.map((t) => {
+            if (t.id.toString() !== taskId) return t;
+
+            const newStart = new Date(t.startTime.getTime());
+            console.log("Snapped minutes: ", snappedMinutes);
+            newStart.setMinutes(newStart.getMinutes() + snappedMinutes);
+
+            console.log("New start: ", newStart);
+
+            return { ...t, startTime: newStart };
+          }),
+        );
+      }
+  }
+
+  function handleResizeEnd({ active, delta } : any) {
+    console.log("Dragging ", active.id, delta)
+
+    const actualTaskId = parseInt(active.id.replace('resize-', ''))
+    const minutesPerPx = 60 / HOUR_WIDTH_PX;
+    const deltaMin = delta.x * minutesPerPx;
+    const snappedMinutes = Math.round(deltaMin / 15) * 15
+
+    setTasks((prevTasks) => 
       prevTasks.map((t) => {
-        if (t.id.toString() !== taskId) return t;
+        if(t.id !== actualTaskId) return t;
 
-        const newStart = new Date(t.startTime.getTime());
-        console.log("Snapped minutes: ", snappedMinutes);
-        newStart.setMinutes(newStart.getMinutes() + snappedMinutes);
+        const newDuration = Math.max(15, t.Duration + snappedMinutes);
+        const newEndTime = new Date(t.startTime.getTime())
+        newEndTime.setMinutes(newEndTime.getMinutes() + newDuration)
 
-        console.log("New start: ", newStart);
-
-        return { ...t, startTime: newStart };
-      }),
-    );
+        return { ...t, Duration: newDuration, EndTime: newEndTime }
+      })
+    )
   }
 
   return (
@@ -159,12 +205,11 @@ export default function GantGrid({
         <DndContext
           sensors={sensors}
           onDragEnd={handleDragEnd}
-          modifiers={[restrictToHorizontalAxis, snapToGrid]} // snapToGrid({ x: 35, y: 40 })
+          modifiers={[restrictToHorizontalAxis, snapToGrid]}
         >
           {tasks
-            // .filter((t) => t.id)
             .map((task, index) => (
-              <GantTask key={task.id} task={task} index={index} />
+              <GantTask key={task.id} task={task} index={index} onResize={handleResizeEnd} />
             ))}
         </DndContext>
 

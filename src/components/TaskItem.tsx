@@ -84,7 +84,6 @@ export default function TaskItem({
   return (
     <div
       ref={setNodeRef}
-      // { ...(inputFocus ? {} : { ...attributes, ...listeners }) }
       {...attributes}
       {...listeners}
       className="flex items-center gap-3 px-4 cursor-move
