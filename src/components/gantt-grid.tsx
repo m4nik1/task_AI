@@ -62,7 +62,6 @@ export default function GantGrid({
 
   function handleDragEnd({ active, delta }: any) {
     const taskId = active.id;
-    console.log("Dropped: ", active.id, delta);
 
     const minutesPerPx = 60 / HOUR_WIDTH_PX;
 
@@ -70,9 +69,7 @@ export default function GantGrid({
 
     const snappedMinutes = Math.round(deltaMinutes / 30) * 30;
 
-
     if(taskId.startsWith('resize-')) {
-      console.log('resizing now!')
       const actualId = parseInt(taskId.replace('resize-', ''));
 
       setTasks((prevTasks) => 
@@ -83,13 +80,14 @@ export default function GantGrid({
             return t;
           }
   
-          const newDuration = Math.max(15, t.Duration + snappedMinutes);
+          const newDuration = Math.max(30, t.Duration + snappedMinutes);
           const newEndTime = new Date(t.startTime.getTime())
           newEndTime.setMinutes(newEndTime.getMinutes() + newDuration)
 
 
           console.log("new duration: ", newDuration)
-  
+          console.log("new endTime: ", newEndTime);
+          
           return { ...t, Duration: newDuration, EndTime: newEndTime }
         })
       )
@@ -99,7 +97,6 @@ export default function GantGrid({
             if (t.id.toString() !== taskId) return t;
 
             const newStart = new Date(t.startTime.getTime());
-            console.log("Snapped minutes: ", snappedMinutes);
             newStart.setMinutes(newStart.getMinutes() + snappedMinutes);
 
             console.log("New start: ", newStart);
@@ -107,16 +104,18 @@ export default function GantGrid({
             return { ...t, startTime: newStart };
           }),
         );
-      }
+    }  
   }
 
   function handleResizeEnd({ active, delta } : any) {
-    console.log("Dragging ", active.id, delta)
+//    console.log("Dragging ", active.id, delta)
+    console.log("Handle resizing the end")
 
     const actualTaskId = parseInt(active.id.replace('resize-', ''))
     const minutesPerPx = 60 / HOUR_WIDTH_PX;
     const deltaMin = delta.x * minutesPerPx;
-    const snappedMinutes = Math.round(deltaMin / 15) * 15
+    console.log("DeltaMinutes: ", deltaMin)
+    const snappedMinutes = Math.round(deltaMin / 30) * 30;
 
     setTasks((prevTasks) => 
       prevTasks.map((t) => {
@@ -129,6 +128,50 @@ export default function GantGrid({
         return { ...t, Duration: newDuration, EndTime: newEndTime }
       })
     )
+  }
+
+  function handleDragMove({ active, delta } : any) {
+    const taskId = active.id
+    console.log("tasks: ", tasks);
+
+    // This is for resizing
+    if(taskId.startsWith('resize-')) {
+      const actualId = parseInt(taskId.replace('resize-', ''));
+      const minutesPerPx = 60 / HOUR_WIDTH_PX;
+      const deltaMi = delta.x / HOUR_WIDTH_PX;
+      const snappedMinutes = Math.round(deltaMi / 30) * 30;
+
+      console.log("Resizing...")
+      setTasks((prevTasks) =>
+        prevTasks.map((t) => { 
+          if(t.id !== actualId) return t;
+
+          const newDuration = t.Duration + snappedMinutes;
+          const newEndTime = new Date(t.EndTime.getTime() + newDuration * 60 * 1000);
+          //newEndTime.setMinutes(newEndTime.getMinutes() + newDuration);
+
+
+          return { ...t, Duration: newDuration, EndTime: newEndTime }
+        })
+      )
+    }
+    else {
+      // Handle regular task dragging (not resize)
+      const minutesPerPx = 60 / HOUR_WIDTH_PX;
+      const deltaMinutes = delta.x * minutesPerPx;
+      const snappedMinutes = Math.round(deltaMinutes / 30) * 30;
+
+      setTasks((prevTasks) =>
+        prevTasks.map((t) => {
+          if (t.id.toString() !== taskId) return t;
+
+          const newStart = new Date(t.startTime.getTime());
+          newStart.setMinutes(newStart.getMinutes() + snappedMinutes);
+
+          return { ...t, startTime: newStart };
+        })
+      );
+    }
   }
 
   return (
@@ -204,6 +247,7 @@ export default function GantGrid({
         `}</style>
         <DndContext
           sensors={sensors}
+          onDragMove={handleDragMove}
           onDragEnd={handleDragEnd}
           modifiers={[restrictToHorizontalAxis, snapToGrid]}
         >
