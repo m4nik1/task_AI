@@ -1,6 +1,6 @@
 "use client";
 
-import { SetStateAction, use, useMemo } from "react";
+import { SetStateAction, useMemo } from "react";
 import { TaskDB } from "../../types";
 import { getXFromHour } from "@/lib/utils";
 import GantTask from "./gantTask";
@@ -61,6 +61,7 @@ export default function GantGrid({
   const snapToGrid = createSnapModifier(HOUR_WIDTH_PX);
 
   function handleDragEnd({ active, delta }: any) {
+
     const taskId = active.id;
 
     const minutesPerPx = 60 / HOUR_WIDTH_PX;
@@ -70,64 +71,38 @@ export default function GantGrid({
     const snappedMinutes = Math.round(deltaMinutes / 30) * 30;
 
     if(taskId.startsWith('resize-')) {
-      const actualId = parseInt(taskId.replace('resize-', ''));
+      const actualId = taskId.replace('resize-', '');
 
-      setTasks((prevTasks) => 
-        prevTasks.map((t) => {
-          if(t.id !== actualId) {
-            console.log('t.di: ', t.id)
-            console.log('taskId: ', taskId)
-            return t;
-          }
-  
+      setTasks((prev) => 
+        prev.map((t) => {
+          if(t.id != actualId) return t;
+
+          console.log("Does this work?")
+
+          console.log("Resizing in handleDragEnd")
+
           const newDuration = Math.max(30, t.Duration + snappedMinutes);
-          const newEndTime = new Date(t.startTime.getTime())
-          newEndTime.setMinutes(newEndTime.getMinutes() + newDuration)
+          const newEndTime = new Date(t.startTime.getTime());
 
+          newEndTime.setMinutes(newEndTime.getMinutes() + newDuration);
 
-          console.log("new duration: ", newDuration)
-          console.log("new endTime: ", newEndTime);
-          
           return { ...t, Duration: newDuration, EndTime: newEndTime }
         })
       )
-    } else {
-        setTasks((prevTasks) =>
-          prevTasks.map((t) => {
-            if (t.id.toString() !== taskId) return t;
+    }
 
-            const newStart = new Date(t.startTime.getTime());
-            newStart.setMinutes(newStart.getMinutes() + snappedMinutes);
-
-            console.log("New start: ", newStart);
-
-            return { ...t, startTime: newStart };
-          }),
-        );
-    }  
-  }
-
-  function handleResizeEnd({ active, delta } : any) {
-//    console.log("Dragging ", active.id, delta)
-    console.log("Handle resizing the end")
-
-    const actualTaskId = parseInt(active.id.replace('resize-', ''))
-    const minutesPerPx = 60 / HOUR_WIDTH_PX;
-    const deltaMin = delta.x * minutesPerPx;
-    console.log("DeltaMinutes: ", deltaMin)
-    const snappedMinutes = Math.round(deltaMin / 30) * 30;
-
-    setTasks((prevTasks) => 
+    setTasks((prevTasks) =>
       prevTasks.map((t) => {
-        if(t.id !== actualTaskId) return t;
+        if (t.id.toString() !== taskId) return t;
 
-        const newDuration = Math.max(15, t.Duration + snappedMinutes);
-        const newEndTime = new Date(t.startTime.getTime())
-        newEndTime.setMinutes(newEndTime.getMinutes() + newDuration)
+        const newStart = new Date(t.startTime.getTime());
+        newStart.setMinutes(newStart.getMinutes() + snappedMinutes);
 
-        return { ...t, Duration: newDuration, EndTime: newEndTime }
-      })
-    )
+        console.log("New start: ", newStart);
+
+        return { ...t, startTime: newStart };
+      }),
+    );
   }
 
   function handleDragMove({ active, delta } : any) {
@@ -137,7 +112,6 @@ export default function GantGrid({
     // This is for resizing
     if(taskId.startsWith('resize-')) {
       const actualId = parseInt(taskId.replace('resize-', ''));
-      const minutesPerPx = 60 / HOUR_WIDTH_PX;
       const deltaMi = delta.x / HOUR_WIDTH_PX;
       const snappedMinutes = Math.round(deltaMi / 30) * 30;
 
@@ -148,7 +122,6 @@ export default function GantGrid({
 
           const newDuration = t.Duration + snappedMinutes;
           const newEndTime = new Date(t.EndTime.getTime() + newDuration * 60 * 1000);
-          //newEndTime.setMinutes(newEndTime.getMinutes() + newDuration);
 
 
           return { ...t, Duration: newDuration, EndTime: newEndTime }
@@ -157,9 +130,11 @@ export default function GantGrid({
     }
     else {
       // Handle regular task dragging (not resize)
-      const minutesPerPx = 60 / HOUR_WIDTH_PX;
-      const deltaMinutes = delta.x * minutesPerPx;
-      const snappedMinutes = Math.round(deltaMinutes / 30) * 30;
+      const deltaMinutes = delta.x / HOUR_WIDTH_PX;
+      const snappedMinutes = Math.round(deltaMinutes / 15) * 15;
+
+      console.log("Delta mouse: ", deltaMinutes)
+      console.log("snapped minutes? ", snappedMinutes) 
 
       setTasks((prevTasks) =>
         prevTasks.map((t) => {
@@ -253,24 +228,16 @@ export default function GantGrid({
         >
           {tasks
             .map((task, index) => (
-              <GantTask key={task.id} task={task} index={index} onResize={handleResizeEnd} />
+              <GantTask key={task.id} task={task} index={index} />
             ))}
         </DndContext>
-
-        {/* {Array.from({ length: tasks.length + 10 }, (_, i) => (
-          <div
-            key={i}
-            className="absolute left-0 right-0 border-b border-gray-700"
-            style={{ top: `${i * 40 + 40}px` }}
-          ></div>
-        ))} */}
-
         {/* Horizontal red line to show current time */}
         <div
           className="absolute top-0 bottom-0 w-0.5 bg-red-500 z-10"
           style={{ left: currentTimeLinePos }}
         >
-          <div className="absolute -top-1 -left-1.5 w-3 h-3 bg-red-500 rounded-full"></div>
+          <div
+            className="absolute -top-1 -left-1.5 w-3 h-3 bg-red-500 rounded-full"></div>
         </div>
       </div>
     </div>

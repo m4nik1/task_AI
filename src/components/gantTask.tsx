@@ -5,55 +5,49 @@ import { useCallback, useEffect, useState } from "react";
 interface GantTaskProps {
   task: TaskDB;
   index: number;
-  onResize: (taskID: number, newDuration: number) => void;
 }
 
-export default function GantTask({ task, index, onResize }: GantTaskProps) {
+export default function GantTask({ task, index }: GantTaskProps) {
   const HOUR_WIDTH_PX = 70; // Pixels per hour
   const START_HOUR_DISPLAY = 7; // Start time for the visible grid (7 AM)
+  let widthPx = (task.Duration / 60) * HOUR_WIDTH_PX;
 
   const { attributes, listeners, setNodeRef, transform } = useDraggable({
     id: task.id.toString(),
   });
 
-  const { attributes: resizeAttributes, listeners: resizeListeners, setNodeRef: setResizeNodeRef } = useDraggable({
+  const { attributes: resizeAttributes, 
+          listeners: resizeListeners, 
+          setNodeRef: setResizeNodeRef, 
+          transform: resizeTransform } = useDraggable({
     id: `resize-${task.id}`,
   });
 
   const [isResizing, setIsResizing] = useState(false)
 
-  const style = {
+   const handleResizeMouseDown = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation()
+    if(resizeTransform)   widthPx += resizeTransform.x;
+    setIsResizing(true);
+  }, []);
+
+  const handleResizeMouseUp = useCallback(() => {
+    setIsResizing(false);
+  }, []);
+
+   const style = {
     left: `${
       (task.startTime.getHours() - START_HOUR_DISPLAY) * HOUR_WIDTH_PX
     }px`,
-    width: (task.Duration / 60) * HOUR_WIDTH_PX,
+    width: widthPx, 
     top: `${index * 40 + 10}px`,
     transform: transform
       ? `translate3d(${transform.x}px, ${transform.y}px, 0)`
       : undefined,
   };
 
-  const handleResizeMouseDown = useCallback((e: React.MouseEvent) => {
-    e.stopPropagation()
-    setIsResizing(true);
-  }, [])
-
-  const handleResizeMouseUp = useCallback(() => {
-    setIsResizing(false);
-  }, [])
-
-  // const handleResizeEnd = useCallback(({ delta } : any) => {
-  //   if(onResize && isResizing) {
-  //     const minutesPerPx = 60 / HOUR_WIDTH_PX;
-  //     const deltaMin = delta.x * minutesPerPx;
-  //     const newDuration = Math.max(15, task.Duration + Math.round(deltaMinutes / 15) * 15);
-
-  //     onResize(task.id, newDuration)
-  //   }
-  //   setIsResizing(false)
-  // }, [onResize, isResizing, setIsResizing, HOUR_WIDTH_PX, task.Duration, task.id])
-
-  return (
+  
+  return ( 
     <div
       ref={setNodeRef}
       {...listeners}
