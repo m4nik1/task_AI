@@ -60,7 +60,7 @@ export default function GantGrid({
 
   const snapToGrid = createSnapModifier(HOUR_WIDTH_PX);
 
-  function handleDragEnd({ active, delta }: any) {
+  async function handleDragEnd({ active, delta }: any) {
 
     const taskId = active.id;
 
@@ -69,6 +69,8 @@ export default function GantGrid({
     const deltaMinutes = delta.x * minutesPerPx;
 
     const snappedMinutes = Math.round(deltaMinutes / 30) * 30;
+
+    let taskFound;
 
     if(taskId.startsWith('resize-')) {
       const actualId = taskId.replace('resize-', '');
@@ -86,9 +88,21 @@ export default function GantGrid({
 
           newEndTime.setMinutes(newEndTime.getMinutes() + newDuration);
 
+          taskFound = { id: actualId, Duration: newDuration, EndTime: newEndTime }
+
           return { ...t, Duration: newDuration, EndTime: newEndTime }
         })
       )
+
+      const response = await fetch('/api/updateTask',{
+          method: 'POST',
+          body: JSON.stringify({
+            taskFound
+          })
+        }
+      )
+
+      console.log("Response: ", response)
     }
 
     setTasks((prevTasks) =>
