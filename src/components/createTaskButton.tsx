@@ -2,13 +2,11 @@ import { TaskDB } from "../../types";
 
 interface CreateTaskProps {
   setTasks: React.Dispatch<React.SetStateAction<TaskDB[]>>;
-  tasks: TaskDB[];
   currentDate: Date;
 }
 
 export default function CreateTaskButton({
   setTasks,
-  tasks,
   currentDate,
 }: CreateTaskProps) {
   async function createNewTask() {

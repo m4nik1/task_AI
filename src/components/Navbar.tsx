@@ -18,7 +18,7 @@ export default function Navbar() {
       console.log("user session status: ", userSession);
     }
     getSession();
-  }, [setSession]);
+  }, [setSession, userSession]);
 
   function signOut() {
     console.log("Signing out");

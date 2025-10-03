@@ -23,8 +23,7 @@ export async function POST(req : NextRequest) {
             }, 
         });
 
-        // return NextResponse.json({ data: taskID.id }, { status: 201 });
-        return NextResponse.json({ data: 20 }, { status: 201 });
+        return NextResponse.json({ data: taskID.id }, { status: 201 });
     } catch(err) {
         console.error(err)
         

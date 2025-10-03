@@ -75,7 +75,6 @@ export default function TaskList({
         </DndContext>
         <CreateTaskButton
           setTasks={setTasks}
-          tasks={tasks}
           currentDate={currentDate}
         />
       </div>

@@ -43,7 +43,7 @@ export default function HomePageClient({ taskDB }: HomeProps) {
     if (currentDate) {
       setCurrentTasks(tasksForDate);
     }
-  }, [currentDate]);
+  }, [currentDate, tasksForDate]);
 
   if (!isClient || !currentDate) {
     return (

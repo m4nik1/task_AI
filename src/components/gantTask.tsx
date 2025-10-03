@@ -1,6 +1,6 @@
 import { useDraggable } from "@dnd-kit/core";
 import { TaskDB } from "../../types";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback } from "react";
 
 interface GantTaskProps {
   task: TaskDB;
@@ -23,16 +23,9 @@ export default function GantTask({ task, index }: GantTaskProps) {
     id: `resize-${task.id}`,
   });
 
-  const [isResizing, setIsResizing] = useState(false)
-
    const handleResizeMouseDown = useCallback((e: React.MouseEvent) => {
     e.stopPropagation()
     if(resizeTransform)   widthPx += resizeTransform.x;
-    setIsResizing(true);
-  }, []);
-
-  const handleResizeMouseUp = useCallback(() => {
-    setIsResizing(false);
   }, []);
 
    const style = {
@@ -65,7 +58,6 @@ export default function GantTask({ task, index }: GantTaskProps) {
         {...resizeAttributes} 
         className={`task-resizer w-3 h-full cursor-ew-resize absolute right-0 top-0`} 
         onMouseDown={handleResizeMouseDown} 
-        onMouseUp={handleResizeMouseUp}
       ></div>
     </div>
   );

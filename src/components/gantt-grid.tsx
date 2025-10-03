@@ -1,6 +1,6 @@
 "use client";
 
-import { SetStateAction, useMemo } from "react";
+import { SetStateAction } from "react";
 import { TaskDB } from "../../types";
 import { getXFromHour } from "@/lib/utils";
 import GantTask from "./gantTask";
