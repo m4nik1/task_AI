@@ -1,29 +1,24 @@
 "use client";
 import { Button } from "./ui/button";
 import { Calendar } from "lucide-react";
-// import Link from "next/link";
-// import { useState, useEffect } from "react";
+import Link from "next/link";
+import { useEffect, useState } from "react";
 
 export default function Navbar() {
   const viewOptions = ["Day"];
-  // "Week"];
 
-  // const session = await auth.api.getSession({
-  //   headers: await headers(),
-  // });
-  // const [userSession, setSession] = useState(null);
-  // const [isLoading, setIsLoading] = useState(true);
+  const [userSession, setSession] = useState(null);
 
-  // useEffect(() => {
-  //   async function getSession() {
-  //     const session = await fetch("/api/checkSession", { method: "GET" });
-  //     const resData = await session.json();
-  //     console.log("res data: ", resData.data);
-  //     setSession(resData.data);
-  //     console.log("user session status: ", userSession);
-  //   }
-  //   getSession();
-  // }, [setSession]);
+  useEffect(() => {
+    async function getSession() {
+      const session = await fetch("/api/checkSession", { method: "GET" });
+      const resData = await session.json();
+      console.log("res data: ", resData.data);
+      setSession(resData.data);
+      console.log("user session status: ", userSession);
+    }
+    getSession();
+  }, [setSession]);
 
   function signOut() {
     console.log("Signing out");
@@ -61,13 +56,13 @@ export default function Navbar() {
             </Button>
           ))}
         </div>
-        {/*{!userSession ? (*/}
-        {/*<Button>
+        {!userSession ? (
+        <Button>
             <Link href="/signIn">Sign In</Link>
           </Button>
-        ) : (*/}
+        ) : (
         <Button onClick={signOut}>Sign Out</Button>
-        {/*)}*/}
+        )}
       </div>
     </div>
   );

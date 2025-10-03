@@ -16,11 +16,16 @@ model playing_with_neon {
 
 model userTasks {
   id        Int      @id @default(autoincrement())
+  user_id   String
   name      String
   status    String
   startTime DateTime
   Duration  Int
   EndTime   DateTime
+  user      User     @relation(fields: [user_id], references: [id])
+
+
+  @@map("usertasks")
 }
 
 model User {
@@ -33,6 +38,7 @@ model User {
   updatedAt     DateTime
   sessions      Session[]
   accounts      Account[]
+  userTasks     userTasks[]
 
   @@unique([email])
   @@map("user")
