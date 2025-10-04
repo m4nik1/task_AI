@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import TaskList from "./TaskList";
 import GantGrid from "./gantt-grid";
+import ChatPanel from "./ChatPanel";
 import { TaskDB } from "../../types";
 
 interface HomeProps {
@@ -55,9 +56,9 @@ export default function HomePageClient({ taskDB }: HomeProps) {
 
   return (
     <div className="flex h-screen dark:bg-[#1f1f1f] dark:text-gray-100">
-      <div className="flex-1 flex bg-gray-50 dark:bg-[#1f1f1f]">
+      <div className="flex bg-gray-50 dark:bg-[#1f1f1f]">
+        <ChatPanel />
         <TaskList tasks={tasks} setTasks={setTasks} currentDate={currentDate} />
-
         <GantGrid
           setTasks={setTasks}
           tasks={tasks}

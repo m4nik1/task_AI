@@ -244,7 +244,7 @@ export default function GantGrid({
         >
           {tasks
             .map((task, index) => (
-              <GantTask key={`gant-${task.id}`} task={task} index={index} />
+              <GantTask key={task.id} task={task} index={index} />
             ))}
         </DndContext>
         {/* Horizontal red line to show current time */}

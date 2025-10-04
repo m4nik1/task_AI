@@ -13,7 +13,7 @@ export default function GantTask({ task, index }: GantTaskProps) {
   let widthPx = (task.Duration / 60) * HOUR_WIDTH_PX;
 
   const { attributes, listeners, setNodeRef, transform } = useDraggable({
-    id: task.id,
+    id: task.id.toString(),
   });
 
   const { attributes: resizeAttributes, 
