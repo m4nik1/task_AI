@@ -14,40 +14,25 @@ model playing_with_neon {
   value Float? @db.Real
 }
 
-model userTasks {
-  id        Int      @id @default(autoincrement())
-  user_id   String
-  name      String
-  status    String
-  startTime DateTime
-  Duration  Int
-  EndTime   DateTime
-  user      User     @relation(fields: [user_id], references: [id])
-
-
-  @@map("usertasks")
-}
-
 model User {
-  id            String    @id
+  id            String      @id
   name          String
-  email         String
+  email         String      @unique
   emailVerified Boolean
   image         String?
   createdAt     DateTime
   updatedAt     DateTime
-  sessions      Session[]
   accounts      Account[]
-  userTasks     userTasks[]
+  sessions      Session[]
+  usertasks     usertasks[]
 
-  @@unique([email])
   @@map("user")
 }
 
 model Session {
   id        String   @id
   expiresAt DateTime
-  token     String
+  token     String   @unique
   createdAt DateTime
   updatedAt DateTime
   ipAddress String?
@@ -55,7 +40,6 @@ model Session {
   userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@unique([token])
   @@map("session")
 }
 
@@ -64,7 +48,6 @@ model Account {
   accountId             String
   providerId            String
   userId                String
-  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   accessToken           String?
   refreshToken          String?
   idToken               String?
@@ -74,6 +57,7 @@ model Account {
   password              String?
   createdAt             DateTime
   updatedAt             DateTime
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("account")
 }
@@ -87,4 +71,15 @@ model Verification {
   updatedAt  DateTime?
 
   @@map("verification")
+}
+
+model usertasks {
+  id        Int      @id @default(autoincrement())
+  user_id   String
+  name      String
+  status    String
+  startTime DateTime
+  Duration  Int
+  EndTime   DateTime
+  user      User     @relation(fields: [user_id], references: [id])
 }

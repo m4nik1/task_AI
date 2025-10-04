@@ -69,8 +69,7 @@ export default function GantGrid({
     const deltaMinutes = delta.x * minutesPerPx;
 
     const snappedMinutes = Math.round(deltaMinutes / 30) * 30;
-
-    let taskFound;
+    let taskData;
 
     if(taskId.startsWith('resize-')) {
       const actualId = taskId.replace('resize-', '');
@@ -88,35 +87,41 @@ export default function GantGrid({
 
           newEndTime.setMinutes(newEndTime.getMinutes() + newDuration);
 
-          taskFound = { id: actualId, Duration: newDuration, EndTime: newEndTime }
+          taskData = { id: t.id, startTime: t.startTime, Duration: newDuration, EndTime: newEndTime }
 
           return { ...t, Duration: newDuration, EndTime: newEndTime }
         })
       )
 
-      const response = await fetch('/api/updateTask',{
-          method: 'POST',
-          body: JSON.stringify({
-            taskFound
-          })
-        }
-      )
-
-      console.log("Response: ", response)
+      await fetch('/api/updateTask/', {
+        method: 'POST',
+        body: JSON.stringify(taskData)
+      })
     }
 
-    setTasks((prevTasks) =>
-      prevTasks.map((t) => {
-        if (t.id.toString() !== taskId) return t;
+    else {
+      setTasks((prevTasks) =>
+        prevTasks.map((t) => {
+          if (t.id.toString() !== taskId) return t;
 
-        const newStart = new Date(t.startTime.getTime());
-        newStart.setMinutes(newStart.getMinutes() + snappedMinutes);
+          const newStart = new Date(t.startTime.getTime());
+          newStart.setMinutes(newStart.getMinutes() + snappedMinutes);
 
-        console.log("New start: ", newStart);
+          const newEndTime = new Date(t.EndTime.getTime())
+          newEndTime.setMinutes(newEndTime.getMinutes() + t.Duration)
 
-        return { ...t, startTime: newStart };
-      }),
-    );
+          console.log("New start: ", newStart);
+
+          taskData = { id: t.id, startTime: newStart, EndTime: newEndTime }
+
+          return { ...t, startTime: newStart, EndTime: newEndTime, Duration: t.Duration };
+        }),
+      );
+      await fetch('/api/updateTask/', {
+        method: 'POST',
+        body: JSON.stringify(taskData)
+      })
+    }
   }
 
   function handleDragMove({ active, delta } : any) {
@@ -146,9 +151,6 @@ export default function GantGrid({
       // Handle regular task dragging (not resize)
       const deltaMinutes = delta.x / HOUR_WIDTH_PX;
       const snappedMinutes = Math.round(deltaMinutes / 15) * 15;
-
-      console.log("Delta mouse: ", deltaMinutes)
-      console.log("snapped minutes? ", snappedMinutes) 
 
       setTasks((prevTasks) =>
         prevTasks.map((t) => {
@@ -242,7 +244,7 @@ export default function GantGrid({
         >
           {tasks
             .map((task, index) => (
-              <GantTask key={task.id} task={task} index={index} />
+              <GantTask key={`gant-${task.id}`} task={task} index={index} />
             ))}
         </DndContext>
         {/* Horizontal red line to show current time */}
