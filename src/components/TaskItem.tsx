@@ -64,18 +64,19 @@ export default function TaskItem({
         console.error(err);
       }
     } else if (
-      e?.code == "Backspace" &&
-      (taskName.current?.valueOf.toString() || "") === ""
+      e?.code == "Backspace"
     ) {
       console.log("Deleting task");
       const newTasks = [...tasks];
       // setTasks(newTasks.splice(index, 1, task))
       newTasks.splice(index, 1);
 
-      fetch("/api/deleteTask", {
+      const response = await fetch("/api/deleteTask", {
         method: "POST",
         body: JSON.stringify(task),
       });
+      
+      console.log("response for deleting task: ", response)
 
       setTasks(newTasks);
     }
