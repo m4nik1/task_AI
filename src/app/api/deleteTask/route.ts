@@ -4,7 +4,7 @@ import { NextRequest, NextResponse } from "next/server";
 export async function POST(req: NextRequest) {
     const reqData = await req.json()
 
-    const result = await prisma.userTasks.delete({
+    const result = await prisma.usertasks.delete({
         where: {
             id: reqData.id,
         },

@@ -12,11 +12,10 @@ export async function POST(req : NextRequest) {
       })
 
        console.log("Session received: ", session?.user.id);
+        delete reqData.id;
+        console.log("Req data has been recieved: ", reqData);
 
-       delete reqData.id;
-       console.log("Req data has been recieved: ", reqData);
-
-        const taskID = await prisma.userTasks.create({ 
+        const taskID = await prisma.usertasks.create({ 
             data: {...reqData, user_id: session?.user.id},
             select: {
                 id: true,
