@@ -166,7 +166,7 @@ export default function GantGrid({
   }
 
   return (
-    <div className="flex-1 flex flex-col dark:bg-[#1f1f1f] overflow-hidden">
+    <div className="flex-1 flex flex-col dark:bg-[#1f1f1f] overflow-hidden m-0 p-0">
       {/* Date Navi */}
       <DateNavigation currentDate={currentDate} navigateDate={navigateDate} />
 
