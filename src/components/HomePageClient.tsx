@@ -5,6 +5,7 @@ import TaskList from "./TaskList";
 import GantGrid from "./gantt-grid";
 import ChatPanel from "./ChatPanel";
 import { TaskDB } from "../../types";
+import { MessageCircle } from "lucide-react";
 
 interface HomeProps {
   taskDB: TaskDB[];
@@ -13,6 +14,7 @@ interface HomeProps {
 export default function HomePageClient({ taskDB }: HomeProps) {
   const [currentDate, setCurrentDate] = useState<Date | null>(null);
   const [isClient, setIsClient] = useState(false);
+  const [isChatOpen, setIsChatOpen] = useState(true);
 
   const [tasks, setTasks] = useState<TaskDB[]>(taskDB);
   const [currentTasks, setCurrentTasks] = useState<TaskDB[]>([]);
@@ -57,7 +59,16 @@ export default function HomePageClient({ taskDB }: HomeProps) {
   return (
     <div className="flex h-screen dark:bg-[#1f1f1f] dark:text-gray-100">
       <div className="flex bg-gray-50 dark:bg-[#1f1f1f]">
-        <ChatPanel />
+        {isChatOpen && <ChatPanel onClose={() => setIsChatOpen(false)} />}
+        {!isChatOpen && (
+          <button
+            onClick={() => setIsChatOpen(true)}
+            className="fixed right-4 top-1/2 transform -translate-y-1/2 z-10 bg-blue-500 text-white p-3 rounded-l-lg shadow-lg hover:bg-blue-600 transition-colors"
+            aria-label="Open chat"
+          >
+            <MessageCircle className="w-5 h-5" />
+          </button>
+        )}
         <TaskList tasks={tasks} setTasks={setTasks} currentDate={currentDate} />
         <GantGrid
           setTasks={setTasks}

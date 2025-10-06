@@ -1,6 +1,6 @@
 import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
-import { Send } from "lucide-react";
+import { Send, X } from "lucide-react";
 
 interface Message {
   id: string;
@@ -9,7 +9,11 @@ interface Message {
   timestamp: Date;
 }
 
-export default function ChatPanel() {
+interface ChatPanelProps {
+  onClose: () => void;
+}
+
+export default function ChatPanel({ onClose }: ChatPanelProps) {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "1",
@@ -61,10 +65,16 @@ export default function ChatPanel() {
 
   return (
     <div className="w-80 flex-shrink-0 dark:bg-[#1f1f1f] border-r border-gray-200 dark:border-gray-700 flex flex-col">
-      <div className="flex items-center px-4 py-3 border-b border-gray-200 dark:border-gray-700">
+      <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-gray-700">
         <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
           Task Assistant
         </h2>
+        <button
+          onClick={onClose}
+          className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+        >
+          <X className="w-4 h-4 text-gray-500" />
+        </button>
       </div>
 
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
