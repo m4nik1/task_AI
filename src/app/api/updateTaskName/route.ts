@@ -6,7 +6,7 @@ export async function POST(req : NextRequest) {
 
     console.log("Date Recieved")
 
-    const result = await prisma.userTasks.update({
+    const result = await prisma.usertasks.update({
         where: { id: reqData.id },
         data: {
             name: reqData.name
