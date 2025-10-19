@@ -25,7 +25,7 @@ export default function ChatPanel() {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
-  const handleSend = () => {
+  const handleSend = async () => {
     if (inputValue.trim() === "") return;
 
     // Add user message
@@ -39,16 +39,32 @@ export default function ChatPanel() {
     setMessages((prev) => [...prev, userMessage]);
     setInputValue("");
 
-    setTimeout(() => {
-      const aiMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        text: "I'm here to help with your task management. You can ask me to create tasks, reschedule them, or get productivity tips.",
-        sender: "ai",
-        timestamp: new Date(),
-      };
-      setMessages((prev) => [...prev, aiMessage]);
-      scrollToBottom();
-    }, 1000);
+    // setTimeout(() => {
+    //   const aiMessage: Message = {
+    //     id: (Date.now() + 1).toString(),
+    //     text: "I'm here to help with your task management. You can ask me to create tasks, reschedule them, or get productivity tips.",
+    //     sender: "ai",
+    //     timestamp: new Date(),
+    //   };
+    //   // make the api request here
+    //   setMessages((prev) => [...prev, aiMessage]);
+    //   scrollToBottom();
+    // }, 1000);
+
+    const userMessage2 = {
+      id: Date.now(),
+      text: inputValue,
+    };
+    console.log("Making the request to AI now....")
+    const response = await fetch("/api/chatLLM", {
+      method: "POST",
+      body: JSON.stringify(userMessage2)
+    });
+
+    const aiMessage = await response.json();
+
+    setMessages((prev) => [...prev, aiMessage]);
+    scrollToBottom();
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -80,12 +96,6 @@ export default function ChatPanel() {
               }`}
             >
               <p className="text-sm">{message.text}</p>
-              <p className="text-xs mt-1 opacity-70">
-                {message.timestamp.toLocaleTimeString([], {
-                  hour: "2-digit",
-                  minute: "2-digit",
-                })}
-              </p>
             </div>
           </div>
         ))}

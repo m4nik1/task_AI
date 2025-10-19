@@ -25,7 +25,7 @@ export default function CreateTaskButton({
     })
 
     const taskID = await res.json()
-
+    console.log("task id from add task api: ", taskID)
     newTask.id = taskID.data
     setTasks((prevTasks) => [...prevTasks, newTask]);
   }

@@ -16,7 +16,7 @@ export async function POST(req : NextRequest) {
         console.log("Req data has been recieved: ", reqData);
 
         const taskID = await prisma.usertasks.create({ 
-            data: {...reqData, user_id: session?.user.id},
+            data: {...reqData, user_id: session?.user.id },
             select: {
                 id: true,
             }, 
