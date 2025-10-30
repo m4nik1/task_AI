@@ -36,35 +36,68 @@ export default function ChatPanel() {
       timestamp: new Date(),
     };
 
+    let aiMessage : Message;
+
     setMessages((prev) => [...prev, userMessage]);
     setInputValue("");
 
-    // setTimeout(() => {
-    //   const aiMessage: Message = {
-    //     id: (Date.now() + 1).toString(),
-    //     text: "I'm here to help with your task management. You can ask me to create tasks, reschedule them, or get productivity tips.",
-    //     sender: "ai",
-    //     timestamp: new Date(),
-    //   };
-    //   // make the api request here
-    //   setMessages((prev) => [...prev, aiMessage]);
-    //   scrollToBottom();
-    // }, 1000);
+    setTimeout(() => {
+      aiMessage = {
+        id: (Date.now() + 1).toString(),
+        text: "I'm here to help with your task management. You can ask me to create tasks, reschedule them, or get productivity tips.",
+        sender: "ai",
+        timestamp: new Date(),
+      };
+      // make the api request here
+      setMessages((prev) => [...prev, aiMessage]);
+      scrollToBottom();
+    }, 1000);
 
     const userMessage2 = {
       id: Date.now(),
       text: inputValue,
     };
-    console.log("Making the request to AI now....")
-    const response = await fetch("/api/chatLLM", {
+    console.log("Making the request to AI now....");
+
+    const aiResponse = await fetch("/api/chatLLM", {
       method: "POST",
-      body: JSON.stringify(userMessage2)
+      body: JSON.stringify(userMessage2),
     });
 
-    const aiMessage = await response.json();
+    const readerStream = aiResponse.body?.getReader();
+    const decoder = new TextDecoder();
 
-    setMessages((prev) => [...prev, aiMessage]);
-    scrollToBottom();
+    try {
+      while (true) {
+        const { done, value } = await readerStream.read();
+        if (done) {
+          // When the stream is done, flush any remaining bytes in the decoder
+          const finalChunk = decoder.decode();
+          if (finalChunk) {
+            console.log("Final chunk: ", finalChunk);
+          }
+          break;
+        }
+
+        if (value) {
+          // Decode the Uint8Array chunk to text, handling multi-byte characters
+          const chunk = decoder.decode(value, { stream: true });
+          if(chunk.split('"type:"')[1] == null) {
+            console.log("Chunk: ", chunk.split('"message":')[1].split('"')[1])
+            const aiMessage2 = chunk.split('"message":')[1].split('"')[1];
+
+            setMessages((prev) =>
+              prev.map((m) => (m.id === (Date.now() + 1).toString()? { ...m, text: m.text + aiMessage2 } : m))
+            );
+          }
+          // Here you can process the chunk (e.g., append to UI)
+        }
+      }
+    } catch (error) {
+      console.error("Stream reading error:", error);
+    } finally {
+      readerStream.releaseLock();
+    }
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
