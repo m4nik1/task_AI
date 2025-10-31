@@ -44,7 +44,7 @@ export default function ChatPanel() {
     setTimeout(() => {
       aiMessage = {
         id: (Date.now() + 1).toString(),
-        text: "I'm here to help with your task management. You can ask me to create tasks, reschedule them, or get productivity tips.",
+        text: "",
         sender: "ai",
         timestamp: new Date(),
       };
@@ -80,16 +80,13 @@ export default function ChatPanel() {
         }
 
         if (value) {
-          // Decode the Uint8Array chunk to text, handling multi-byte characters
           const chunk = decoder.decode(value, { stream: true });
           if(chunk.split('"type:"')[1] == null) {
-            console.log("Chunk: ", chunk.split('"message":')[1].split('"')[1])
             const aiMessage2 = chunk.split('"message":')[1].split('"')[1];
 
             setMessages((prev) =>
               prev.map((m) => {
                 if(m.id == aiMessage.id) {
-                  console.log("Message found: ", m);
                   return { ...m, text: m.text + aiMessage2 } 
                 } else {
                   return m;
@@ -97,7 +94,6 @@ export default function ChatPanel() {
               })
             );
           }
-          // Here you can process the chunk (e.g., append to UI)
         }
       }
     } catch (error) {
