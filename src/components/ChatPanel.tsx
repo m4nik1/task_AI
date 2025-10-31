@@ -87,7 +87,14 @@ export default function ChatPanel() {
             const aiMessage2 = chunk.split('"message":')[1].split('"')[1];
 
             setMessages((prev) =>
-              prev.map((m) => (m.id === (Date.now() + 1).toString()? { ...m, text: m.text + aiMessage2 } : m))
+              prev.map((m) => {
+                if(m.id == aiMessage.id) {
+                  console.log("Message found: ", m);
+                  return { ...m, text: m.text + aiMessage2 } 
+                } else {
+                  return m;
+                }
+              })
             );
           }
           // Here you can process the chunk (e.g., append to UI)
