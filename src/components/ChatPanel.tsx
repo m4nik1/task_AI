@@ -36,7 +36,7 @@ export default function ChatPanel() {
       timestamp: new Date(),
     };
 
-    let aiMessage : Message;
+    let aiMessage: Message;
 
     setMessages((prev) => [...prev, userMessage]);
     setInputValue("");
@@ -64,8 +64,13 @@ export default function ChatPanel() {
       body: JSON.stringify(userMessage2),
     });
 
+    // console.log("AI response: ", await aiResponse.json())
+
     const readerStream = aiResponse.body?.getReader();
     const decoder = new TextDecoder();
+
+    console.log("Reader: ", readerStream);
+
 
     try {
       while (true) {
@@ -81,19 +86,21 @@ export default function ChatPanel() {
 
         if (value) {
           const chunk = decoder.decode(value, { stream: true });
-          if(chunk.split('"type:"')[1] == null) {
-            const aiMessage2 = chunk.split('"message":')[1].split('"')[1];
+          console.log("Chunk: ", chunk.split('text'))
+          // if (chunk.split('"type:"')[1] == null) {
+          // const aiMessage2 = chunk.split('"text":')[1].split('"')[1];
+          //   console.log("message: ", chunk.split('text'))
 
-            setMessages((prev) =>
-              prev.map((m) => {
-                if(m.id == aiMessage.id) {
-                  return { ...m, text: m.text + aiMessage2 } 
-                } else {
-                  return m;
-                }
-              })
-            );
-          }
+          // setMessages((prev) =>
+          //   prev.map((m) => {
+          //     if(m.id == aiMessage.id) {
+          //       return { ...m, text: m.text + aiMessage2 } 
+          //     } else {
+          //       return m;
+          //     }
+          //   })
+          // );
+          // }
         }
       }
     } catch (error) {
@@ -125,11 +132,10 @@ export default function ChatPanel() {
             className={`flex ${message.sender === "user" ? "justify-end" : "justify-start"}`}
           >
             <div
-              className={`max-w-xs lg:max-w-md px-4 py-3 rounded-2xl shadow-sm ${
-                message.sender === "user"
-                  ? "bg-blue-300 text-gray-800 rounded-tr-none"
-                  : "bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white rounded-tl-none"
-              }`}
+              className={`max-w-xs lg:max-w-md px-4 py-3 rounded-2xl shadow-sm ${message.sender === "user"
+                ? "bg-blue-300 text-gray-800 rounded-tr-none"
+                : "bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white rounded-tl-none"
+                }`}
             >
               <p className="text-sm">{message.text}</p>
             </div>

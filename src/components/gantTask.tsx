@@ -16,31 +16,31 @@ export default function GantTask({ task, index }: GantTaskProps) {
     id: task.id.toString(),
   });
 
-  const { attributes: resizeAttributes, 
-          listeners: resizeListeners, 
-          setNodeRef: setResizeNodeRef, 
-          transform: resizeTransform } = useDraggable({
+  const {
+    attributes: resizeAttributes,
+    listeners: resizeListeners,
+    setNodeRef: setResizeNodeRef,
+    transform: resizeTransform,
+  } = useDraggable({
     id: `resize-${task.id}`,
   });
 
-   const handleResizeMouseDown = useCallback((e: React.MouseEvent) => {
-    e.stopPropagation()
-    if(resizeTransform)   widthPx += resizeTransform.x;
+  const handleResizeMouseDown = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (resizeTransform) widthPx += resizeTransform.x;
   }, []);
 
-   const style = {
-    left: `${
-      (task.startTime.getHours() - START_HOUR_DISPLAY) * HOUR_WIDTH_PX
-    }px`,
-    width: widthPx, 
+  const style = {
+    left: `${(task.startTime.getHours() - START_HOUR_DISPLAY) * HOUR_WIDTH_PX
+      }px`,
+    width: widthPx,
     top: `${index * 40 + 10}px`,
     transform: transform
       ? `translate3d(${transform.x}px, ${transform.y}px, 0)`
       : undefined,
   };
 
-  
-  return ( 
+  return (
     <div
       ref={setNodeRef}
       {...listeners}
@@ -52,13 +52,14 @@ export default function GantTask({ task, index }: GantTaskProps) {
       <span className="truncate pointer-events-none select-none">
         {task.name}
       </span>
-      <div 
-        ref={setResizeNodeRef} 
-        {...resizeListeners} 
-        {...resizeAttributes} 
-        className={`task-resizer w-3 h-full cursor-ew-resize absolute right-0 top-0`} 
-        onMouseDown={handleResizeMouseDown} 
-      ></div>
+      <div
+        ref={setResizeNodeRef}
+        {...resizeListeners}
+        {...resizeAttributes}
+        className={`task-resizer w-3 h-full cursor-ew-resize absolute right-0 top-0`}
+        onMouseDown={handleResizeMouseDown}
+      >
+      </div>
     </div>
   );
 }

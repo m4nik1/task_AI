@@ -21,12 +21,12 @@ export default function CreateTaskButton({
 
     const res = await fetch("/api/addTask", {
       method: "POST",
-      body: JSON.stringify(newTask)
-    })
+      body: JSON.stringify(newTask),
+    });
 
-    const taskID = await res.json()
-    console.log("task id from add task api: ", taskID)
-    newTask.id = taskID.data
+    const taskID = await res.json();
+    console.log("task id from add task api: ", taskID);
+    newTask.id = taskID.data;
     setTasks((prevTasks) => [...prevTasks, newTask]);
   }
 
@@ -37,7 +37,8 @@ export default function CreateTaskButton({
                 hover-bg-gray-50 transition-colors border-b border-gray-100"
       style={{ height: "40px" }}
     >
-      <div className="w-3 h-3 border border-dashed border-gray-300 rounded-full flex-shrink-0"></div>
+      <div className="w-3 h-3 border border-dashed border-gray-300 rounded-full flex-shrink-0">
+      </div>
       <p className="text-sm">Create Task</p>
     </button>
   );

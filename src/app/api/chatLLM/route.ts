@@ -5,18 +5,20 @@ export async function POST(req: NextRequest) {
 
   console.log("user message: ", JSON.stringify(reqJSON));
 
-  // make the request to the server
-  const response = await fetch("http://localhost:8000/chat_llm", {
-    headers: { "Content-type": "application/json" },
-    method: "POST",
-    body: JSON.stringify(reqJSON),
-  });
+  // Make the request to the server
+  const response = await fetch("http://localhost:8000/llm_context")
+  // headers: { "Content-type": "application/json" },
+  // method: "POST",
+  // body: JSON.stringify(reqJSON),
+  // });
 
   if (!response.body) {
     return NextResponse.json("There was no server body", { status: 500 });
   }
 
   const readerStream = response.body.getReader();
+  console.log("Stream: ", readerStream);
+
   const readableStream = new ReadableStream({
     start(controller) {
       function pump() {
@@ -25,6 +27,7 @@ export async function POST(req: NextRequest) {
             controller.close();
             return;
           }
+          // console.log("Value from LLM: ", value);
           controller.enqueue(value);
           pump();
         });
@@ -32,6 +35,10 @@ export async function POST(req: NextRequest) {
       pump();
     },
   });
+
+  // return NextResponse.json({ Message: "Stream is working" }, {
+  //   status: 200,
+  // });
 
   return new Response(readableStream, {
     status: 201,

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import TaskList from "./TaskList";
 import GantGrid from "./gantt-grid";
 import ChatPanel from "./ChatPanel";
