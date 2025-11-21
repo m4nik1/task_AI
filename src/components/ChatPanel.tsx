@@ -40,6 +40,13 @@ export default function ChatPanel() {
 
     setMessages((prev) => [...prev, userMessage]);
     setInputValue("");
+    aiMessage = {
+      id: (Date.now() + 1).toString(),
+      text: "",
+      sender: "ai",
+      timestamp: new Date(),
+    };
+
 
     setTimeout(() => {
       aiMessage = {
@@ -64,7 +71,6 @@ export default function ChatPanel() {
       body: JSON.stringify(userMessage2),
     });
 
-    // console.log("AI response: ", await aiResponse.json())
 
     const readerStream = aiResponse.body?.getReader();
     const decoder = new TextDecoder();
@@ -86,21 +92,22 @@ export default function ChatPanel() {
 
         if (value) {
           const chunk = decoder.decode(value, { stream: true });
-          console.log("Chunk: ", chunk.split('text'))
-          // if (chunk.split('"type:"')[1] == null) {
-          // const aiMessage2 = chunk.split('"text":')[1].split('"')[1];
-          //   console.log("message: ", chunk.split('text'))
+          const messageObj = JSON.parse(chunk.split('text:')[1]).text
 
-          // setMessages((prev) =>
-          //   prev.map((m) => {
-          //     if(m.id == aiMessage.id) {
-          //       return { ...m, text: m.text + aiMessage2 } 
-          //     } else {
-          //       return m;
-          //     }
-          //   })
-          // );
-          // }
+          if (messageObj != null) {
+            const aiMessage2 = messageObj
+
+            setMessages((prev) =>
+              prev.map((m) => {
+                if (m.id == aiMessage.id) {
+                  console.log("message has been found")
+                  return { ...m, text: m.text + aiMessage2 }
+                } else {
+                  return m;
+                }
+              })
+            );
+          }
         }
       }
     } catch (error) {
