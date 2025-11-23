@@ -48,14 +48,14 @@ export default function HomePageClient({ taskDB }: HomeProps) {
 
   if (!isClient || !currentDate) {
     return (
-      <div className="flex h-screen items-center justify-center">
+      <div className="flex h-full items-center justify-center">
         <div className="text-lg">Loading...</div>
       </div>
     );
   }
 
   return (
-    <div className="flex h-screen dark:bg-[#1f1f1f] dark:text-gray-100 w-full m-0 p-0">
+    <div className="flex h-full dark:bg-[#1f1f1f] dark:text-gray-100 w-full m-0 p-0">
       <div className="flex bg-gray-50 dark:bg-[#1f1f1f] w-full h-full">
         <TaskList tasks={tasks} setTasks={setTasks} currentDate={currentDate} />
         <div className="flex-1 flex flex-col min-w-0 border-r border-gray-200 dark:border-gray-700 h-full">

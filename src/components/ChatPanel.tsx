@@ -55,7 +55,9 @@ export default function ChatPanel() {
         sender: "ai",
         timestamp: new Date(),
       };
-      // make the api request here
+
+
+      // Make the api request here
       setMessages((prev) => [...prev, aiMessage]);
       scrollToBottom();
     }, 1000);
@@ -76,6 +78,8 @@ export default function ChatPanel() {
 
 
     const readerStream = aiResponse.body?.getReader();
+
+    if (!readerStream) return;
     const decoder = new TextDecoder();
 
     console.log("Reader: ", readerStream);
@@ -103,7 +107,6 @@ export default function ChatPanel() {
             setMessages((prev) =>
               prev.map((m) => {
                 if (m.id == aiMessage.id) {
-                  console.log("message has been found")
                   return { ...m, text: m.text + aiMessage2 }
                 } else {
                   return m;
@@ -128,9 +131,9 @@ export default function ChatPanel() {
   };
 
   return (
-    <div className="w-80 flex-shrink-0 dark:bg-[#2d2d2d] flex flex-col bg-white m-0 h-full">
-      <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-[#3d3d3d]">
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+    <div className="w-80 flex-shrink-0 flex flex-col h-full bg-background border-l border-border">
+      <div className="flex items-center justify-between px-4 py-3 border-b border-border bg-background/50 backdrop-blur-sm">
+        <h2 className="text-sm font-semibold text-foreground">
           Task Assistant
         </h2>
       </div>
@@ -142,36 +145,36 @@ export default function ChatPanel() {
             className={`flex ${message.sender === "user" ? "justify-end" : "justify-start"}`}
           >
             <div
-              className={`max-w-xs lg:max-w-md px-4 py-3 rounded-2xl shadow-sm ${message.sender === "user"
-                ? "bg-blue-300 text-gray-800 rounded-tr-none"
-                : "bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white rounded-tl-none"
+              className={`max-w-[85%] px-4 py-3 rounded-2xl text-sm leading-relaxed shadow-sm ${message.sender === "user"
+                ? "bg-primary text-primary-foreground rounded-tr-sm"
+                : "bg-muted text-foreground rounded-tl-sm"
                 }`}
             >
-              <p className="text-sm">{message.text}</p>
+              <p>{message.text}</p>
             </div>
           </div>
         ))}
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Input box */}
-      <div className="border-t border-gray-200 dark:border-gray-700 p-4 bg-gray-50 dark:bg-[#3d3d3d]">
+      <div className="p-4 bg-background border-t border-border">
         <div className="relative">
           <input
             type="text"
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
             onKeyDown={handleKeyPress}
-            placeholder="Type your message..."
-            className="w-full text-sm rounded-xl border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 p-3 pr-12 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            placeholder="Ask AI..."
+            className="w-full text-sm rounded-full bg-muted border-none px-4 py-3 pr-12 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring transition-all"
           />
           <Button
             onClick={handleSend}
             size="icon"
-            className="absolute right-2 bottom-2 h-8 w-8 bg-white hover:bg-gray-100 rounded-full shadow-md border border-gray-300"
+            variant="ghost"
+            className="absolute right-1.5 top-1.5 h-9 w-9 hover:bg-background rounded-full text-muted-foreground hover:text-primary"
             disabled={inputValue.trim() === ""}
           >
-            <Send className="h-4 w-4 text-gray-500" />
+            <Send className="h-4 w-4" />
           </Button>
         </div>
       </div>
