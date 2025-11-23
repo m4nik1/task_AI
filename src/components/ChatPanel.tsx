@@ -67,6 +67,9 @@ export default function ChatPanel() {
     console.log("Making the request to AI now....");
 
     const aiResponse = await fetch("/api/chatLLM", {
+      headers: {
+        "Content-type": "application/json"
+      },
       method: "POST",
       body: JSON.stringify(userMessage2),
     });
