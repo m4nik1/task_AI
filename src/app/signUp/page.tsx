@@ -1,64 +1,136 @@
 "use client";
 
-import { useRef } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { authClient } from "@/lib/auth-client";
-import { redirect } from "next/navigation";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { LayoutDashboard, Loader2 } from "lucide-react";
 
-export default function SignUpForm() {
-  const emailRef = useRef<HTMLInputElement>(null);
-  const passwordRef = useRef<HTMLInputElement>(null);
-  const nameRef = useRef<HTMLInputElement>(null);
+export default function SignUp() {
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    setIsLoading(true);
+    setError(null);
 
-    const email = emailRef.current?.value || "";
-    const password = passwordRef.current?.value || "";
-    const name = nameRef.current?.value || "";
-
-    const { data, error } = await authClient.signUp.email(
-      {
-        email: email,
-        name: name,
-        password: password,
-        callbackURL: "/signIn",
-      },
-      {
-        //callbacks
-        onRequest: (ctx) => {
-          console.log("Request is being made");
-          console.log("ctx: ", ctx);
+    try {
+      const { error } = await authClient.signUp.email(
+        {
+          email,
+          name,
+          password,
+          callbackURL: "/signIn",
         },
-        onSuccess: (ctx) => {
-          console.log("Login worked!");
-          console.log("ctx: ", ctx);
-          redirect("/");
-        },
-        onError: (ctx) => {
-          // display the error message
-          console.log("error", ctx.error.message);
-        },
+        {
+          onSuccess: () => {
+            router.push("/");
+          },
+          onError: (ctx) => {
+            setError(ctx.error.message ?? "An error occurred");
+          },
+        }
+      );
+      
+      if (error) {
+        setError(error.message || "An error occurred");
       }
-    );
-
-    console.log("Data: ", data);
-    console.log("error: ", error);
+    } catch (err) {
+      setError("Something went wrong. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="flex flex-col gap-4 w-80 p-6 border rounded-lg shadow-sm"
-    >
-      <h2 className="text-xl font-semibold">Create Account</h2>
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-primary/5 via-background to-secondary/5 px-4">
+      <div className="w-full max-w-sm space-y-6">
+        <div className="flex flex-col items-center gap-2 text-center">
+          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+            <LayoutDashboard className="h-6 w-6" />
+          </div>
+          <h1 className="text-2xl font-bold tracking-tight">Create an account</h1>
+          <p className="text-sm text-muted-foreground">
+            Enter your details to create your account
+          </p>
+        </div>
 
-      <Input ref={emailRef} type="email" placeholder="Email" />
-      <Input ref={nameRef} type="name" placeholder="name" />
-      <Input ref={passwordRef} type="password" placeholder="Password" />
+        <div className="rounded-xl border border-border bg-card/50 backdrop-blur-xl text-card-foreground shadow-sm p-6">
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="name">Name</Label>
+              <Input
+                id="name"
+                type="text"
+                placeholder="John Doe"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                required
+                disabled={isLoading}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                type="email"
+                placeholder="m@example.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                disabled={isLoading}
+              />
+            </div>
 
-      <Button type="submit">Sign Up</Button>
-    </form>
+            <div className="space-y-2">
+              <Label htmlFor="password">Password</Label>
+              <Input
+                id="password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                disabled={isLoading}
+              />
+            </div>
+
+            {error && (
+              <div className="text-sm font-medium text-destructive text-center">
+                {error}
+              </div>
+            )}
+
+            <Button type="submit" className="w-full" disabled={isLoading}>
+              {isLoading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Creating account...
+                </>
+              ) : (
+                "Sign Up"
+              )}
+            </Button>
+          </form>
+
+          <div className="mt-4 text-center text-sm">
+            <span className="text-muted-foreground">Already have an account? </span>
+            <Link
+              href="/signIn"
+              className="font-medium text-primary underline-offset-4 hover:underline"
+            >
+              Sign in
+            </Link>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }

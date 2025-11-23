@@ -20,7 +20,7 @@ export default function SignIn() {
     setError(null);
 
     try {
-      const { data, error } = await authClient.signIn.email({
+      const { error } = await authClient.signIn.email({
         email,
         password,
         callbackURL: "/",
@@ -38,7 +38,7 @@ export default function SignIn() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4">
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-primary/5 via-background to-secondary/5 px-4">
       <div className="w-full max-w-sm space-y-6">
         <div className="flex flex-col items-center gap-2 text-center">
           <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary text-primary-foreground">
@@ -50,7 +50,7 @@ export default function SignIn() {
           </p>
         </div>
 
-        <div className="rounded-xl border border-border bg-card text-card-foreground shadow-sm p-6">
+        <div className="rounded-xl border border-border bg-card/50 backdrop-blur-xl text-card-foreground shadow-sm p-6">
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>

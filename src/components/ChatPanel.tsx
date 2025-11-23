@@ -131,8 +131,8 @@ export default function ChatPanel() {
   };
 
   return (
-    <div className="w-80 flex-shrink-0 flex flex-col h-full bg-background border-l border-border">
-      <div className="flex items-center justify-between px-4 py-3 border-b border-border bg-background/50 backdrop-blur-sm">
+    <div className="w-80 flex-shrink-0 flex flex-col h-full bg-background/60 backdrop-blur-xl border-l border-border">
+      <div className="flex items-center justify-between px-4 py-3 border-b border-border bg-transparent">
         <h2 className="text-sm font-semibold text-foreground">
           Task Assistant
         </h2>
@@ -147,7 +147,7 @@ export default function ChatPanel() {
             <div
               className={`max-w-[85%] px-4 py-3 rounded-2xl text-sm leading-relaxed shadow-sm ${message.sender === "user"
                 ? "bg-primary text-primary-foreground rounded-tr-sm"
-                : "bg-muted text-foreground rounded-tl-sm"
+                : "bg-muted/50 text-foreground rounded-tl-sm border border-border/50"
                 }`}
             >
               <p>{message.text}</p>
@@ -157,7 +157,7 @@ export default function ChatPanel() {
         <div ref={messagesEndRef} />
       </div>
 
-      <div className="p-4 bg-background border-t border-border">
+      <div className="p-4 bg-transparent border-t border-border">
         <div className="relative">
           <input
             type="text"
@@ -165,13 +165,13 @@ export default function ChatPanel() {
             onChange={(e) => setInputValue(e.target.value)}
             onKeyDown={handleKeyPress}
             placeholder="Ask AI..."
-            className="w-full text-sm rounded-full bg-muted border-none px-4 py-3 pr-12 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring transition-all"
+            className="w-full text-sm rounded-full bg-muted/50 border-none px-4 py-3 pr-12 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring transition-all"
           />
           <Button
             onClick={handleSend}
             size="icon"
             variant="ghost"
-            className="absolute right-1.5 top-1.5 h-9 w-9 hover:bg-background rounded-full text-muted-foreground hover:text-primary"
+            className="absolute right-1.5 top-1.5 h-9 w-9 hover:bg-background/50 rounded-full text-muted-foreground hover:text-primary"
             disabled={inputValue.trim() === ""}
           >
             <Send className="h-4 w-4" />
