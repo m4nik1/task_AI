@@ -3,6 +3,7 @@ import { Button } from "./ui/button";
 import { Calendar, LayoutDashboard, LogOut, LogIn } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { authClient } from "@/lib/auth-client";
 
 export default function Navbar() {
   const viewOptions = ["Day"];
@@ -18,9 +19,16 @@ export default function Navbar() {
     getSession();
   }, [setSession, userSession]);
 
-  function signOut() {
+  async function signOut() {
     console.log("Signing out");
     // Add actual sign out logic here later if needed
+    await authClient.signOut({
+      fetchOptions: {
+        onSuccess: () => {
+          redirect('/signIn')
+        }
+      }
+    });
   }
 
   return (
