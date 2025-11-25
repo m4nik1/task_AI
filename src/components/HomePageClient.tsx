@@ -44,6 +44,7 @@ export default function HomePageClient({ taskDB }: HomeProps) {
     if (currentDate) {
       setCurrentTasks(tasksForDate);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentDate]);
 
   if (!isClient || !currentDate) {

@@ -1,9 +1,10 @@
 "use client";
 import { Button } from "./ui/button";
-import { Calendar, LayoutDashboard, LogOut, LogIn } from "lucide-react";
+import { LayoutDashboard, LogOut, LogIn } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { authClient } from "@/lib/auth-client";
+import { redirect } from "next/navigation";
 
 export default function Navbar() {
   const viewOptions = ["Day"];

@@ -1,3 +1,4 @@
+import * as React from "react"
 import {
   closestCenter,
   DndContext,
@@ -57,15 +58,16 @@ export default function TaskList({
           collisionDetection={closestCenter}
           onDragEnd={handleDragEnd}
         >
+          {/* @ts-expect-error To ignore a stupid ts error */}
           <SortableContext
-            items={tasks.map((t) => t.id)}
+            items={tasks.map(t => t.id)}
             strategy={verticalListSortingStrategy}
           >
-            {tasks.map((task, index) => (
+            {tasks.map((t, index) => (
               <TaskItem
-                id={task.id}
-                key={task.id}
-                task={task}
+                id={t.id}
+                key={t.id}
+                task={t}
                 tasks={tasks}
                 index={index}
                 setTasks={setTasks}

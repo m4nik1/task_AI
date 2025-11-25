@@ -10,6 +10,8 @@ import {
   PointerSensor,
   useSensor,
   useSensors,
+  DragMoveEvent,
+  UniqueIdentifier
 } from "@dnd-kit/core";
 import {
   restrictToHorizontalAxis,
@@ -59,10 +61,9 @@ export default function GantGrid({
   const sensors = useSensors(useSensor(PointerSensor));
 
   const snapToGrid = createSnapModifier(HOUR_WIDTH_PX);
+  async function handleDragEnd({ active, delta }: DragMoveEvent) {
 
-  async function handleDragEnd({ active, delta }: any) {
-
-    const taskId = active.id;
+    const taskId = active.id
 
     const minutesPerPx = 60 / HOUR_WIDTH_PX;
 
@@ -71,8 +72,8 @@ export default function GantGrid({
     const snappedMinutes = Math.round(deltaMinutes / 30) * 30;
     let taskData;
 
-    if(taskId.startsWith('resize-')) {
-      const actualId = taskId.replace('resize-', '');
+    if (typeof taskId === 'string' && taskId.startsWith('resize-')) {
+      const actualId = Number(taskId.replace('resize-', ''));
 
       setTasks((prev) => 
         prev.map((t) => {
@@ -123,13 +124,12 @@ export default function GantGrid({
       })
     }
   }
-
-  function handleDragMove({ active, delta } : any) {
-    const taskId = active.id
+  function handleDragMove({ active, delta }: DragMoveEvent) {
+    const taskId = active.id as UniqueIdentifier
     console.log("tasks: ", tasks);
 
     // This is for resizing
-    if(taskId.startsWith('resize-')) {
+    if(typeof taskId === "string" && taskId.startsWith('resize-')) {
       const actualId = parseInt(taskId.replace('resize-', ''));
       const deltaMi = delta.x / HOUR_WIDTH_PX;
       const snappedMinutes = Math.round(deltaMi / 30) * 30;

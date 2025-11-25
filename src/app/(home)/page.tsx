@@ -2,8 +2,7 @@ import prisma from "@/lib/prisma";
 import HomePageClient from "@/components/HomePageClient";
 import { headers } from "next/headers";
 import { auth } from "@/lib/auth";
-import redirect from 'next/navigation'
-import { TaskDB } from "../../../types";
+// import { TaskDB } from "../../../types";
 
 export default async function HomePage() {
   const tasks = await prisma.usertasks.findMany();

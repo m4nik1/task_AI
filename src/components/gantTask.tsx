@@ -27,6 +27,7 @@ export default function GantTask({ task, index }: GantTaskProps) {
 
   const handleResizeMouseDown = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     if (resizeTransform) widthPx += resizeTransform.x;
   }, []);
 

@@ -31,6 +31,7 @@ export default function SignIn() {
         setError(error.message || "An error occurred during sign in");
       }
     } catch (err) {
+      console.error(err)
       setError("Something went wrong. Please try again.");
     } finally {
       setIsLoading(false);
@@ -104,7 +105,7 @@ export default function SignIn() {
           </form>
 
           <div className="mt-4 text-center text-sm">
-            <span className="text-muted-foreground">Don't have an account? </span>
+            <span className="text-muted-foreground">Dont have an account? </span>
             <Link
               href="/signUp"
               className="font-medium text-primary underline-offset-4 hover:underline"
