@@ -10,8 +10,13 @@ import {
   PointerSensor,
   useSensor,
   useSensors,
+  DragMoveEvent,
+  UniqueIdentifier
 } from "@dnd-kit/core";
-import { restrictToHorizontalAxis } from "@dnd-kit/modifiers";
+import {
+  restrictToHorizontalAxis,
+  createSnapModifier,
+} from "@dnd-kit/modifiers";
 
 interface gantGridProps {
   setTasks: React.Dispatch<SetStateAction<TaskDB[]>>;
@@ -50,43 +55,123 @@ export default function GantGrid({
   const currentTimeLinePos = getXFromHour(
     currentHourInDay,
     HOUR_WIDTH_PX,
-    START_HOUR_DISPLAY
+    START_HOUR_DISPLAY,
   );
 
   const sensors = useSensors(useSensor(PointerSensor));
 
-  function handleDragEnd({ active, delta }: any) {
-    const taskId = active.id;
-    console.log("Dropped: ", active.id, delta);
+  const snapToGrid = createSnapModifier(HOUR_WIDTH_PX);
+  async function handleDragEnd({ active, delta }: DragMoveEvent) {
+
+    const taskId = active.id
 
     const minutesPerPx = 60 / HOUR_WIDTH_PX;
 
     const deltaMinutes = delta.x * minutesPerPx;
 
-    const snappedMinutes = Math.round(deltaMinutes / 15) * 15;
+    const snappedMinutes = Math.round(deltaMinutes / 30) * 30;
+    let taskData;
 
-    setTasks((prevTasks) =>
-      prevTasks.map((t) => {
-        if (t.id.toString() !== taskId) return t;
+    if (typeof taskId === 'string' && taskId.startsWith('resize-')) {
+      const actualId = Number(taskId.replace('resize-', ''));
 
-        const newStart = new Date(t.startTime.getTime());
+      setTasks((prev) => 
+        prev.map((t) => {
+          if(t.id != actualId) return t;
 
-        newStart.setMinutes(newStart.getMinutes() + snappedMinutes);
+          console.log("Does this work?")
 
-        console.log("New start: ", newStart);
+          console.log("Resizing in handleDragEnd")
 
-        return { ...t, startTime: newStart };
+          const newDuration = Math.max(30, t.Duration + snappedMinutes);
+          const newEndTime = new Date(t.startTime.getTime());
+
+          newEndTime.setMinutes(newEndTime.getMinutes() + newDuration);
+
+          taskData = { id: t.id, startTime: t.startTime, Duration: newDuration, EndTime: newEndTime }
+
+          return { ...t, Duration: newDuration, EndTime: newEndTime }
+        })
+      )
+
+      await fetch('/api/updateTask/', {
+        method: 'POST',
+        body: JSON.stringify(taskData)
       })
-    );
+    }
+
+    else {
+      setTasks((prevTasks) =>
+        prevTasks.map((t) => {
+          if (t.id.toString() !== taskId) return t;
+
+          const newStart = new Date(t.startTime.getTime());
+          newStart.setMinutes(newStart.getMinutes() + snappedMinutes);
+
+          const newEndTime = new Date(t.EndTime.getTime())
+          newEndTime.setMinutes(newEndTime.getMinutes() + t.Duration)
+
+          console.log("New start: ", newStart);
+
+          taskData = { id: t.id, startTime: newStart, EndTime: newEndTime }
+
+          return { ...t, startTime: newStart, EndTime: newEndTime, Duration: t.Duration };
+        }),
+      );
+      await fetch('/api/updateTask/', {
+        method: 'POST',
+        body: JSON.stringify(taskData)
+      })
+    }
+  }
+  function handleDragMove({ active, delta }: DragMoveEvent) {
+    const taskId = active.id as UniqueIdentifier
+    console.log("tasks: ", tasks);
+
+    // This is for resizing
+    if(typeof taskId === "string" && taskId.startsWith('resize-')) {
+      const actualId = parseInt(taskId.replace('resize-', ''));
+      const deltaMi = delta.x / HOUR_WIDTH_PX;
+      const snappedMinutes = Math.round(deltaMi / 30) * 30;
+
+      console.log("Resizing...")
+      setTasks((prevTasks) =>
+        prevTasks.map((t) => { 
+          if(t.id !== actualId) return t;
+
+          const newDuration = t.Duration + snappedMinutes;
+          const newEndTime = new Date(t.EndTime.getTime() + newDuration * 60 * 1000);
+
+
+          return { ...t, Duration: newDuration, EndTime: newEndTime }
+        })
+      )
+    }
+    else {
+      // Handle regular task dragging (not resize)
+      const deltaMinutes = delta.x / HOUR_WIDTH_PX;
+      const snappedMinutes = Math.round(deltaMinutes / 15) * 15;
+
+      setTasks((prevTasks) =>
+        prevTasks.map((t) => {
+          if (t.id.toString() !== taskId) return t;
+
+          const newStart = new Date(t.startTime.getTime());
+          newStart.setMinutes(newStart.getMinutes() + snappedMinutes);
+
+          return { ...t, startTime: newStart };
+        })
+      );
+    }
   }
 
   return (
-    <div className="flex-1 flex flex-col bg-white overflow-hidden">
+    <div className="flex-1 flex flex-col dark:bg-[#1f1f1f] overflow-hidden m-0 p-0">
       {/* Date Navi */}
       <DateNavigation currentDate={currentDate} navigateDate={navigateDate} />
 
       {/* Time Labels */}
-      <div className="flex border-b border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-800">
+      <div className="flex border-b border-gray-200 dark:bg-[#1f1f1f]">
         <div
           className="flex-1 grid"
           style={{
@@ -97,7 +182,7 @@ export default function GantGrid({
           {timeLabels.map((label, index) => (
             <div
               key={index}
-              className="text-xs text-center text-gray-600 font-medium py-2 border-b"
+              className="text-xs text-center text-white-600 font-medium py-2 border-b"
             >
               {label}
             </div>
@@ -108,48 +193,67 @@ export default function GantGrid({
       {/* Main Grid With tasks */}
 
       <div
-        className="flex-1 relative overflow-auto bg-white"
+        className="flex-1 relative overflow-auto dark:bg-[#1f1f1f]"
         style={{
           minWidth: `${TOTAL_DISPLAY_HOURS * HOUR_WIDTH_PX}px`,
           backgroundSize: `${HOUR_WIDTH_PX}px 100%`,
-          backgroundImage: `linear-gradient(to right, #f3f4f6 1px, transparent 1px)`,
+          backgroundImage: `
+            /* vertical hour lines */
+            repeating-linear-gradient(
+              to right,
+              #3a3a3a,
+              #3a3a3a 1px,
+              transparent 1px,
+              transparent ${HOUR_WIDTH_PX}px
+            ),
+            /* horizontal row lines every 40px to match task rows */
+            repeating-linear-gradient(
+              to bottom,
+              #424242,
+              #424242 1px,
+              transparent 1px,
+              transparent 40px
+            )
+          `,
         }}
       >
         <style jsx>{`
+          /* Making sure the dark override applies */
           .dark .flex-1.relative {
-            background-image: linear-gradient(
-              to rigt,
-              #374151 1px,
+            background-image: repeating-linear-gradient(
+              to right,
+              #3a3a3a
+              #3a3a3a 1px,
               transparent 1px
+              transparent ${HOUR_WIDTH_PX}px
+            ),
+            repeating-linear-gradient (
+              to bottom,
+              #424242
+              #424242 1px,
+              transparent 1px,
+              transparent 40px
             );
           }
         `}</style>
         <DndContext
           sensors={sensors}
+          onDragMove={handleDragMove}
           onDragEnd={handleDragEnd}
-          modifiers={[restrictToHorizontalAxis]}
+          modifiers={[restrictToHorizontalAxis, snapToGrid]}
         >
           {tasks
-            // .filter((t) => t.id)
             .map((task, index) => (
               <GantTask key={task.id} task={task} index={index} />
             ))}
         </DndContext>
-
-        {Array.from({ length: tasks.length + 10 }, (_, i) => (
-          <div
-            key={i}
-            className="absolute left-0 right-0 border-b border-gray-100"
-            style={{ top: `${i * 40 + 40}px` }}
-          ></div>
-        ))}
-
         {/* Horizontal red line to show current time */}
         <div
           className="absolute top-0 bottom-0 w-0.5 bg-red-500 z-10"
           style={{ left: currentTimeLinePos }}
         >
-          <div className="absolute -top-1 -left-1.5 w-3 h-3 bg-red-500 rounded-full"></div>
+          <div
+            className="absolute -top-1 -left-1.5 w-3 h-3 bg-red-500 rounded-full"></div>
         </div>
       </div>
     </div>

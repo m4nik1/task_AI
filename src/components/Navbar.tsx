@@ -1,72 +1,80 @@
 "use client";
 import { Button } from "./ui/button";
-import { Calendar } from "lucide-react";
-// import Link from "next/link";
-// import { useState, useEffect } from "react";
+import { LayoutDashboard, LogOut, LogIn } from "lucide-react";
+import Link from "next/link";
+import { useEffect, useState } from "react";
+import { authClient } from "@/lib/auth-client";
+import { redirect } from "next/navigation";
 
 export default function Navbar() {
   const viewOptions = ["Day"];
-  // "Week"];
+  const [userSession, setSession] = useState(null);
 
-  // const session = await auth.api.getSession({
-  //   headers: await headers(),
-  // });
-  // const [userSession, setSession] = useState(null);
-  // const [isLoading, setIsLoading] = useState(true);
+  useEffect(() => {
+    async function getSession() {
+        const session = await fetch("/api/checkSession", { method: "GET" });
+          const resData = await session.json();
+          setSession(resData.data);
+      console.log("user session status: ", userSession);
+    }
+    getSession();
+  }, [setSession, userSession]);
 
-  // useEffect(() => {
-  //   async function getSession() {
-  //     const session = await fetch("/api/checkSession", { method: "GET" });
-  //     const resData = await session.json();
-  //     console.log("res data: ", resData.data);
-  //     setSession(resData.data);
-  //     console.log("user session status: ", userSession);
-  //   }
-  //   getSession();
-  // }, [setSession]);
-
-  function signOut() {
+  async function signOut() {
     console.log("Signing out");
+    // Add actual sign out logic here later if needed
+    await authClient.signOut({
+      fetchOptions: {
+        onSuccess: () => {
+          redirect('/signIn')
+        }
+      }
+    });
   }
 
   return (
-    <div
-      className="bg-white dark-gray-900 border-b border-gray-200
-    dark:border px-6 py-4 flex justify-between"
-    >
-      <div className="flex items-center gap-4">
-        <div className="w-10 h-10 rounded-lg flex items-center justify-center">
-          <Calendar className="w-5 h-5 text-white"></Calendar>
+    <nav className="border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
+      <div className="flex h-16 items-center px-6 justify-between">
+        <div className="flex items-center gap-2 font-semibold">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+            <LayoutDashboard className="h-4 w-4" />
+          </div>
+          <span className="text-lg tracking-tight">Task AI</span>
         </div>
-        <div>
-          <h1 className="text-xl font-bold text-gray-900">Task AI</h1>
-        </div>
-      </div>
 
-      <div className="flex items-center gap-4">
-        <div
-          className="gap-1 bg-gray-100 dark:bg-gray-800
-          rounded-lg p-1 shadow-inner"
-        >
-          {viewOptions.map((view, index) => (
-            <Button
-              key={index}
+        <div className="flex items-center gap-4">
+          <div className="flex items-center rounded-lg border border-border bg-muted/50 p-1">
+            {viewOptions.map((view, index) => (
+              <Button
+                key={index}
               variant="default"
-              size="sm"
+                size="sm"
               className="px-3 py-1 text-sm"
-            >
-              {view}
+              >
+                {view}
+              </Button>
+            ))}
+          </div>
+          {!userSession ? (
+            <Button asChild variant="default" size="sm" className="gap-2">
+              <Link href="/signIn">
+                <LogIn className="h-3.5 w-3.5" />
+                Sign In
+              </Link>
             </Button>
-          ))}
+          ) : (
+            <Button 
+              onClick={signOut} 
+              variant="ghost" 
+              size="sm" 
+              className="text-muted-foreground hover:text-foreground gap-2"
+            >
+              <LogOut className="h-3.5 w-3.5" />
+              Sign Out
+            </Button>
+          )}
         </div>
-        {/*{!userSession ? (*/}
-        {/*<Button>
-            <Link href="/signIn">Sign In</Link>
-          </Button>
-        ) : (*/}
-        <Button onClick={signOut}>Sign Out</Button>
-        {/*)}*/}
       </div>
-    </div>
+    </nav>
   );
 }

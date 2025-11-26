@@ -1,3 +1,4 @@
+import * as React from "react"
 import {
   closestCenter,
   DndContext,
@@ -43,12 +44,14 @@ export default function TaskList({
   }
 
   return (
-    <div className="w-80 flex-shrink-0 pt-15 bg-white border-r border-gray-200 flex flex-col">
+    <div className="w-80 flex-shrink-0 pt-15 dark:bg-[#1f1f1f] border-r border-gray-200 flex flex-col">
       <div className="flex items-center px-4 py-3 border-b border-gray-200">
-        <h2 className="text-lg font-semibold text-gray-900">Tasks</h2>
+        <h2 className="text-lg font-semibold text-white dark:text-white">
+          Tasks
+        </h2>
       </div>
 
-      <div className="flex-1 relative bg-white">
+      <div className="flex-1 relative">
         <DndContext
           sensors={sensors}
           // collisionDetection={} It should be rectBoundry
@@ -56,14 +59,14 @@ export default function TaskList({
           onDragEnd={handleDragEnd}
         >
           <SortableContext
-            items={tasks.map((t) => t.id)}
+            items={tasks.map(t => t.id)}
             strategy={verticalListSortingStrategy}
           >
-            {tasks.map((task, index) => (
+            {tasks.map((t, index) => (
               <TaskItem
-                id={task.id}
-                key={task.id}
-                task={task}
+                id={t.id}
+                key={t.id}
+                task={t}
                 tasks={tasks}
                 index={index}
                 setTasks={setTasks}
@@ -73,7 +76,6 @@ export default function TaskList({
         </DndContext>
         <CreateTaskButton
           setTasks={setTasks}
-          tasks={tasks}
           currentDate={currentDate}
         />
       </div>

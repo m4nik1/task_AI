@@ -1,5 +1,6 @@
 import { useDraggable } from "@dnd-kit/core";
 import { TaskDB } from "../../types";
+import { useCallback } from "react";
 
 interface GantTaskProps {
   task: TaskDB;
@@ -9,16 +10,31 @@ interface GantTaskProps {
 export default function GantTask({ task, index }: GantTaskProps) {
   const HOUR_WIDTH_PX = 70; // Pixels per hour
   const START_HOUR_DISPLAY = 7; // Start time for the visible grid (7 AM)
+  let widthPx = (task.Duration / 60) * HOUR_WIDTH_PX;
 
   const { attributes, listeners, setNodeRef, transform } = useDraggable({
     id: task.id.toString(),
   });
 
+  const {
+    attributes: resizeAttributes,
+    listeners: resizeListeners,
+    setNodeRef: setResizeNodeRef,
+    transform: resizeTransform,
+  } = useDraggable({
+    id: `resize-${task.id}`,
+  });
+
+  const handleResizeMouseDown = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    if (resizeTransform) widthPx += resizeTransform.x;
+  }, []);
+
   const style = {
-    left: `${
-      (task.startTime.getHours() - START_HOUR_DISPLAY) * HOUR_WIDTH_PX
-    }px`,
-    // width: (task.Duration / 60) * HOUR_WIDTH_PX,
+    left: `${(task.startTime.getHours() - START_HOUR_DISPLAY) * HOUR_WIDTH_PX
+      }px`,
+    width: widthPx,
     top: `${index * 40 + 10}px`,
     transform: transform
       ? `translate3d(${transform.x}px, ${transform.y}px, 0)`
@@ -37,7 +53,14 @@ export default function GantTask({ task, index }: GantTaskProps) {
       <span className="truncate pointer-events-none select-none">
         {task.name}
       </span>
-      <div className="task-resizer w-3 h-full cursor-ew-resize absolute right-0 top-0"></div>
+      <div
+        ref={setResizeNodeRef}
+        {...resizeListeners}
+        {...resizeAttributes}
+        className={`task-resizer w-3 h-full cursor-ew-resize absolute right-0 top-0`}
+        onMouseDown={handleResizeMouseDown}
+      >
+      </div>
     </div>
   );
 }

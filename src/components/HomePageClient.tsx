@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import TaskList from "./TaskList";
 import GantGrid from "./gantt-grid";
+import ChatPanel from "./ChatPanel";
 import { TaskDB } from "../../types";
 
 interface HomeProps {
@@ -43,27 +44,32 @@ export default function HomePageClient({ taskDB }: HomeProps) {
     if (currentDate) {
       setCurrentTasks(tasksForDate);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentDate]);
 
   if (!isClient || !currentDate) {
     return (
-      <div className="flex h-screen items-center justify-center">
+      <div className="flex h-full items-center justify-center">
         <div className="text-lg">Loading...</div>
       </div>
     );
   }
 
   return (
-    <div className="flex h-screen">
-      <div className="flex-1 flex bg-gray-50">
+    <div className="flex h-full dark:bg-[#1f1f1f] dark:text-gray-100 w-full m-0 p-0">
+      <div className="flex bg-gray-50 dark:bg-[#1f1f1f] w-full h-full">
         <TaskList tasks={tasks} setTasks={setTasks} currentDate={currentDate} />
-
-        <GantGrid
-          setTasks={setTasks}
-          tasks={tasks}
-          navigateDate={navigateDate}
-          currentDate={currentDate}
-        />
+        <div className="flex-1 flex flex-col min-w-0 border-r border-gray-200 dark:border-gray-700 h-full">
+          <GantGrid
+            setTasks={setTasks}
+            tasks={tasks}
+            navigateDate={navigateDate}
+            currentDate={currentDate}
+          />
+        </div>
+        <div className="flex-shrink-0">
+          <ChatPanel />
+        </div>
       </div>
     </div>
   );

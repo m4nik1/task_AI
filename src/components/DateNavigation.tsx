@@ -2,6 +2,8 @@
 
 import { formatDate } from "@/lib/utils";
 import { useState, useEffect } from "react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 interface DateNavigationProps {
   currentDate: Date;
@@ -20,60 +22,35 @@ export default function DateNavigation({
   }, [currentDate]);
 
   return (
-    <div className="flex items-center justify-between px-4 py-3 border-b bg-gray-50">
-      <div className="items-center gap-2">
-        <div className="bg-black text-white px-2 py-1 rounded text-sm font-medium ease-out">
+    <div className="flex items-center justify-between px-6 py-4 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-10">
+      <div className="flex items-center gap-4">
+        <h2 className="text-xl font-semibold text-foreground tracking-tight">
           {formatDate(currentDate)}
+        </h2>
+        <div className="flex items-center gap-1 pl-2 border-l border-border/50">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8 hover:bg-muted"
+            onClick={() => navigateDate(-1)}
+            aria-label="Previous day"
+          >
+            <ChevronLeft className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8 hover:bg-muted"
+            onClick={() => navigateDate(1)}
+            aria-label="Next day"
+          >
+            <ChevronRight className="h-4 w-4" />
+          </Button>
         </div>
-        <button className="p-1 hover-bg-gray-200 rounded">
-          <svg
-            className="w-4 h-4"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path strokeLinejoin="round" strokeWidth={2} d="M15 101-7-7 7-7" />
-          </svg>
-        </button>
-        <button
-          className="p-1 hover:bg-gray-200 rounded transition-colors"
-          onClick={() => navigateDate(-1)}
-        >
-          <svg
-            className="w-4 h-4"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M15 19l-7-7 7-7"
-            />
-          </svg>
-        </button>
-        <button
-          className="p-1 hover:bg-gray-200 rounded transition-colors"
-          onClick={() => navigateDate(1)}
-        >
-          <svg
-            className="w-4 h-4"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M9 5l7 7-7 7"
-            />
-          </svg>
-        </button>
       </div>
-      <div className="text-sm text-gray-600 transition-all duration-300 ease-in-out">
-        {nextDayDate}
+      <div className="hidden sm:flex items-center text-sm text-muted-foreground">
+        <span className="opacity-60 mr-2 font-medium">Next:</span>
+        <span className="font-medium">{nextDayDate}</span>
       </div>
     </div>
   );

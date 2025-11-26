@@ -2,7 +2,7 @@ import prisma from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 
 
-export async function  POST(req : NextRequest) {
+export async function POST(req : NextRequest) {
     const reqData = await req.json()
 
     await prisma.usertasks.update({
@@ -10,7 +10,6 @@ export async function  POST(req : NextRequest) {
         data: {
             startTime: reqData.startTime,
             EndTime: reqData.EndTime,
-            Duration: reqData.Duration,
         }
     })
 

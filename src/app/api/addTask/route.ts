@@ -1,16 +1,22 @@
 import prisma from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
 
 export async function POST(req : NextRequest) {
     try {
        console.log("Request has been received!")
        const reqData = await req.json();
+       const session = await auth.api.getSession({
+        headers: await headers()
+      })
 
-       delete reqData.id;
-       console.log("Req data has been recieved: ", reqData);
+       console.log("Session received: ", session?.user.id);
+        delete reqData.id;
+        console.log("Req data has been recieved: ", reqData);
 
-        const taskID = await prisma.userTasks.create({ 
-            data: reqData,
+        const taskID = await prisma.usertasks.create({ 
+            data: {...reqData, user_id: session?.user.id },
             select: {
                 id: true,
             }, 
