@@ -58,7 +58,6 @@ export default function TaskList({
           collisionDetection={closestCenter}
           onDragEnd={handleDragEnd}
         >
-          {/* @ts-expect-error To ignore a stupid ts error */}
           <SortableContext
             items={tasks.map(t => t.id)}
             strategy={verticalListSortingStrategy}
