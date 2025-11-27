@@ -44,8 +44,8 @@ export default function TaskList({
   }
 
   return (
-    <div className="w-80 flex-shrink-0 pt-15 dark:bg-[#1f1f1f] border-r border-gray-200 flex flex-col">
-      <div className="flex items-center px-4 py-3 border-b border-gray-200">
+    <div className="w-80 flex-shrink-0 pt-[65px] dark:bg-[#1f1f1f] border-r border-gray-200 flex flex-col">
+      <div className="flex items-center px-4 h-[32.8px] border-b border-gray-200">
         <h2 className="text-lg font-semibold text-white dark:text-white">
           Tasks
         </h2>
@@ -54,7 +54,6 @@ export default function TaskList({
       <div className="flex-1 relative">
         <DndContext
           sensors={sensors}
-          // collisionDetection={} It should be rectBoundry
           collisionDetection={closestCenter}
           onDragEnd={handleDragEnd}
         >
