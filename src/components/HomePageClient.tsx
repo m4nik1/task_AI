@@ -42,7 +42,7 @@ export default function HomePageClient({ taskDB }: HomeProps) {
 
   useEffect(() => {
     if (currentDate) {
-      setCurrentTasks(tasksForDate);
+      setCurrentTasks(tasks);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentDate]);
