@@ -42,9 +42,8 @@ export default function GantGrid({
     if (hour === 24) return "12AM";
     if (hour === 25) return "1AM";
     if (hour === 26) return "2AM";
-    return `${hour % 12 === 0 ? 12 : hour % 12}${
-      hour < 12 || hour >= 24 ? "AM" : "PM"
-    }`;
+    return `${hour % 12 === 0 ? 12 : hour % 12}${hour < 12 || hour >= 24 ? "AM" : "PM"
+      }`;
   });
 
   const currentTime = new Date();
@@ -75,9 +74,9 @@ export default function GantGrid({
     if (typeof taskId === 'string' && taskId.startsWith('resize-')) {
       const actualId = Number(taskId.replace('resize-', ''));
 
-      setTasks((prev) => 
+      setTasks((prev) =>
         prev.map((t) => {
-          if(t.id != actualId) return t;
+          if (t.id != actualId) return t;
 
           console.log("Does this work?")
 
@@ -129,15 +128,15 @@ export default function GantGrid({
     console.log("tasks: ", tasks);
 
     // This is for resizing
-    if(typeof taskId === "string" && taskId.startsWith('resize-')) {
+    if (typeof taskId === "string" && taskId.startsWith('resize-')) {
       const actualId = parseInt(taskId.replace('resize-', ''));
       const deltaMi = delta.x / HOUR_WIDTH_PX;
       const snappedMinutes = Math.round(deltaMi / 30) * 30;
 
       console.log("Resizing...")
       setTasks((prevTasks) =>
-        prevTasks.map((t) => { 
-          if(t.id !== actualId) return t;
+        prevTasks.map((t) => {
+          if (t.id !== actualId) return t;
 
           const newDuration = t.Duration + snappedMinutes;
           const newEndTime = new Date(t.EndTime.getTime() + newDuration * 60 * 1000);
