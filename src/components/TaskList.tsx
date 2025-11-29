@@ -59,7 +59,7 @@ export default function TaskList({
         >
           <SortableContext
             items={tasks.map(t => t.id)}
-            strategy={verticalListSortingStrategy}
+          // strategy={verticalListSortingStrategy}
           >
             {tasks.map((t, index) => (
               <TaskItem

@@ -64,7 +64,8 @@ export default function TaskItem({
         console.error(err);
       }
     } else if (
-      e?.code == "Backspace"
+      e?.code == "Backspace" &&
+      taskName.current?.value == ''
     ) {
       console.log("Deleting task");
       const newTasks = [...tasks];
@@ -75,7 +76,7 @@ export default function TaskItem({
         method: "POST",
         body: JSON.stringify(task),
       });
-      
+
       console.log("response for deleting task: ", response)
 
       setTasks(newTasks);
@@ -99,9 +100,8 @@ export default function TaskItem({
       />
       <div className="flex-grow min-w-0">
         <input
-          className={`text-sm font-medium text-gray-900 dark:text-white truncate ${
-            completeCheck ? "line-through" : ""
-          }`}
+          className={`text-sm font-medium text-gray-900 dark:text-white truncate ${completeCheck ? "line-through" : ""
+            }`}
           onKeyDown={confirmTask}
           placeholder="New Task"
           ref={taskName}
