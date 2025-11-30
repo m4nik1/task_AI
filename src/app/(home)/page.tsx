@@ -4,7 +4,9 @@ import { headers } from "next/headers";
 import { auth } from "@/lib/auth";
 
 export default async function HomePage() {
-  const tasks = await prisma.usertasks.findMany();
+  const tasks = await prisma.usertasks.findMany({
+    orderBy: { id: 'asc' }
+  });
 
   const session = await auth.api.getSession({
     headers: await headers(),
