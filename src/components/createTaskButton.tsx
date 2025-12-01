@@ -13,7 +13,7 @@ export default function CreateTaskButton({
     const newTask: TaskDB = {
       id: -1,
       name: "New Task",
-      dateCreated: new Date().toLocaleDateString(),
+      dateCreated: new Date(),
       startTime: currentDate,
       status: "Scheduled",
       Duration: 60, // Default duration

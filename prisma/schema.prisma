@@ -74,12 +74,13 @@ model Verification {
 }
 
 model usertasks {
-  id        Int      @id @default(autoincrement())
-  user_id   String
-  name      String
-  status    String
-  startTime DateTime
-  Duration  Int
-  EndTime   DateTime
-  user      User     @relation(fields: [user_id], references: [id])
+  id          Int      @id @default(autoincrement())
+  dateCreated DateTime
+  user_id     String
+  name        String
+  status      String
+  startTime   DateTime
+  Duration    Int
+  EndTime     DateTime
+  user        User     @relation(fields: [user_id], references: [id])
 }

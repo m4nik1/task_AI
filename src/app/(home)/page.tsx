@@ -15,10 +15,11 @@ export default async function HomePage() {
     return <div>Not Authenticated</div>;
   } else {
     tasks = await prisma.usertasks.findMany({
-      // orderBy: { id: 'asc' },
-      // where: {
-      //   user_id: session.user.id,
-      // }
+      orderBy: { id: 'asc' },
+      where: {
+        user_id: session.user.id,
+        dateCreated: new Date()
+      }
     })
     console.log("tasks: ", tasks)
     return <HomePageClient taskDB={tasks} />;
