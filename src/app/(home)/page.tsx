@@ -4,9 +4,7 @@ import { headers } from "next/headers";
 import { auth } from "@/lib/auth";
 
 export default async function HomePage() {
-  const tasks = await prisma.usertasks.findMany({
-    orderBy: { id: 'asc' }
-  });
+  let tasks;
 
   const session = await auth.api.getSession({
     headers: await headers(),
@@ -19,6 +17,13 @@ export default async function HomePage() {
     return <div>Not Authenticated</div>;
   } else {
     console.log("Authenticated: ", session);
+    console.log("User id: ", session.user.id)
+    tasks = await prisma.usertasks.findMany({
+      orderBy: { id: 'asc' },
+      where: {
+        user_id: session.user.id
+      }
+    })
     return <HomePageClient taskDB={tasks} />;
   }
 
