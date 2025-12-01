@@ -27,6 +27,7 @@ export default function TaskList({
   setTasks,
   currentDate,
 }: TaskListProps) {
+
   const sensors = useSensors(useSensor(PointerSensor));
 
   function handleDragEnd(event: DragEndEvent) {
@@ -59,7 +60,6 @@ export default function TaskList({
         >
           <SortableContext
             items={tasks.map(t => t.id)}
-          // strategy={verticalListSortingStrategy}
           >
             {tasks.map((t, index) => (
               <TaskItem

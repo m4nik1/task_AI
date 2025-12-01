@@ -11,25 +11,16 @@ export default async function HomePage() {
   });
 
   if (!session) {
-    console.log(session);
-    // return <HomePageClient taskDB={tasks} />;
-    // redirect('/signIn')
+    // In the future we change this to the homepage
     return <div>Not Authenticated</div>;
   } else {
-    console.log("Authenticated: ", session);
-    console.log("User id: ", session.user.id)
     tasks = await prisma.usertasks.findMany({
-      orderBy: { id: 'asc' },
-      where: {
-        user_id: session.user.id
-      }
+      // orderBy: { id: 'asc' },
+      // where: {
+      //   user_id: session.user.id,
+      // }
     })
+    console.log("tasks: ", tasks)
     return <HomePageClient taskDB={tasks} />;
   }
-
-  // const tasks = await prisma.userTasks.findMany({
-  //   where: {
-  //     userId:
-  //   }
-  // });
 }
