@@ -10,10 +10,12 @@ export default function CreateTaskButton({
   currentDate,
 }: CreateTaskProps) {
   async function createNewTask() {
+    const date = new Date().toISOString()
+
     const newTask: TaskDB = {
       id: -1,
       name: "New Task",
-      dateCreated: new Date(),
+      dateCreated: new Date(date),
       startTime: currentDate,
       status: "Scheduled",
       Duration: 60, // Default duration

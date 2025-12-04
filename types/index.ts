@@ -12,5 +12,6 @@ export interface TaskDB {
   status: string,
   startTime: Date,
   Duration: number,
-  EndTime: Date  
+  EndTime: Date,
+  dateCreated: Date
 }

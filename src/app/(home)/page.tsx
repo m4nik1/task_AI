@@ -2,6 +2,7 @@ import prisma from "@/lib/prisma";
 import HomePageClient from "@/components/HomePageClient";
 import { headers } from "next/headers";
 import { auth } from "@/lib/auth";
+import moment from "moment";
 
 export default async function HomePage() {
   let tasks;
@@ -14,11 +15,16 @@ export default async function HomePage() {
     // In the future we change this to the homepage
     return <div>Not Authenticated</div>;
   } else {
+    console.log("Date: ", moment().toISOString())
+    const date = moment().toISOString()
+
     tasks = await prisma.usertasks.findMany({
       orderBy: { id: 'asc' },
       where: {
         user_id: session.user.id,
-        dateCreated: new Date()
+        dateCreated: {
+          
+        }
       }
     })
     console.log("tasks: ", tasks)
