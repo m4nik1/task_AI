@@ -31,7 +31,6 @@ export async function POST(req: NextRequest) {
   }
 
   const readerStream = response.body.getReader();
-  console.log("Stream: ", readerStream);
 
   const readableStream = new ReadableStream({
     start(controller) {

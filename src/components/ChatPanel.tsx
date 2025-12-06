@@ -66,7 +66,6 @@ export default function ChatPanel() {
       id: Date.now(),
       text: inputValue,
     };
-    console.log("Making the request to AI now....");
 
     const aiResponse = await fetch("/api/chatLLM", {
       headers: {
@@ -82,7 +81,6 @@ export default function ChatPanel() {
     if (!readerStream) return;
     const decoder = new TextDecoder();
 
-    console.log("Reader: ", readerStream);
 
 
     try {
@@ -92,7 +90,7 @@ export default function ChatPanel() {
           // When the stream is done, flush any remaining bytes in the decoder
           const finalChunk = decoder.decode();
           if (finalChunk) {
-            console.log("Final chunk: ", finalChunk);
+            console.warn("Final chunk: ", finalChunk);
           }
           break;
         }

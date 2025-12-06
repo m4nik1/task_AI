@@ -22,9 +22,9 @@ export default async function HomePage() {
       orderBy: { id: 'asc' },
       where: {
         user_id: session.user.id,
-        dateCreated: {
-          
-        }
+        // dateCreated: {
+        //
+        // }
       }
     })
     console.log("tasks: ", tasks)
