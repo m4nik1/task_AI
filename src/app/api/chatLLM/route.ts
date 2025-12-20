@@ -40,7 +40,6 @@ export async function POST(req: NextRequest) {
             controller.close();
             return;
           }
-          // console.log("Value from LLM: ", value);
           controller.enqueue(value);
           pump();
         });
