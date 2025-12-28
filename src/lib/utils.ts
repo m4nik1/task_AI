@@ -30,7 +30,9 @@ export function formatTime(hour: number) {
         .toString()
         .padStart(2, "0")}`
       : "00";
-  return `${displayHour}:${minutes}${period}`;
+  const time = `${displayHour}:${minutes}${period}`;
+  
+  return time;
 }
 
 export function getXFromHour(
