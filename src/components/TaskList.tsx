@@ -13,7 +13,6 @@ import CreateTaskButton from "./createTaskButton";
 import {
   arrayMove,
   SortableContext,
-  verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 
 interface TaskListProps {

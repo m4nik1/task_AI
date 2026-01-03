@@ -1,5 +1,6 @@
 import prisma from "@/lib/prisma";
 import HomePageClient from "@/components/HomePageClient";
+import LandingPage from "@/components/LandingPage";
 import { headers } from "next/headers";
 import { auth } from "@/lib/auth";
 import moment from "moment";
@@ -12,8 +13,7 @@ export default async function HomePage() {
   });
 
   if (!session) {
-    // In the future we change this to the homepage
-    return <div>Not Authenticated</div>;
+    return <LandingPage />;
   } else {
     console.log("Date: ", moment().toISOString())
     const date = moment().toISOString()
