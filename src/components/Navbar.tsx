@@ -7,7 +7,6 @@ import { authClient } from "@/lib/auth-client";
 import { redirect } from "next/navigation";
 
 export default function Navbar() {
-  const viewOptions = ["Day"];
   const [userSession, setSession] = useState(null);
 
   useEffect(() => {
@@ -43,18 +42,6 @@ export default function Navbar() {
         </div>
 
         <div className="flex items-center gap-4">
-          <div className="flex items-center rounded-lg border border-border bg-muted/50 p-1">
-            {viewOptions.map((view, index) => (
-              <Button
-                key={index}
-              variant="default"
-                size="sm"
-              className="px-3 py-1 text-sm"
-              >
-                {view}
-              </Button>
-            ))}
-          </div>
           {!userSession ? (
             <Button asChild variant="default" size="sm" className="gap-2">
               <Link href="/signIn">
