@@ -54,15 +54,15 @@ export default function LandingPage() {
             {/* Stats */}
             <div className="mt-20 grid w-full max-w-3xl grid-cols-3 gap-8 border-t border-border pt-12 md:gap-16">
               <div className="flex flex-col items-center space-y-2">
-                <div className="text-4xl font-black text-foreground">10x</div>
+                <div className="text-4xl font-black text-blue-600">10x</div>
                 <div className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Faster Planning</div>
               </div>
               <div className="flex flex-col items-center space-y-2">
-                <div className="text-4xl font-black text-foreground">AI</div>
+                <div className="text-4xl font-black text-purple-600">AI</div>
                 <div className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Smart Assistant</div>
               </div>
               <div className="flex flex-col items-center space-y-2">
-                <div className="text-4xl font-black text-foreground">100%</div>
+                <div className="text-4xl font-black text-emerald-600">100%</div>
                 <div className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Secure</div>
               </div>
             </div>
@@ -190,7 +190,7 @@ export default function LandingPage() {
         <div className="mx-auto max-w-6xl">
           <div className="flex flex-col items-center justify-between gap-6 md:flex-row">
             <div className="flex items-center gap-2">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary text-primary-foreground">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-600 text-white">
                 <Calendar className="h-6 w-6" />
               </div>
               <span className="text-xl font-bold tracking-tight">Task AI</span>

@@ -35,7 +35,7 @@ export default function GantTask({ task, index }: GantTaskProps) {
     left: `${(task.startTime.getHours() - START_HOUR_DISPLAY) * HOUR_WIDTH_PX
       }px`,
     width: widthPx,
-    top: `${index * 40 + 10}px`,
+    top: `${index * 48 + 8}px`,
     transform: transform
       ? `translate3d(${transform.x}px, ${transform.y}px, 0)`
       : undefined,
@@ -46,8 +46,9 @@ export default function GantTask({ task, index }: GantTaskProps) {
       ref={setNodeRef}
       {...listeners}
       {...attributes}
-      className={`absolute h-8 rounded select-none active:cursor-grabbing flex items-center
-                justify-between px-2 text-white font-medium bg-blue-500`}
+      className="absolute h-8 rounded-lg select-none cursor-grab active:cursor-grabbing flex items-center
+                justify-between px-3 text-white text-sm font-medium bg-blue-600 shadow-md
+                hover:bg-blue-500 hover:shadow-lg transition-all duration-150 border border-blue-500/50"
       style={style}
     >
       <span className="truncate pointer-events-none select-none">
@@ -57,10 +58,10 @@ export default function GantTask({ task, index }: GantTaskProps) {
         ref={setResizeNodeRef}
         {...resizeListeners}
         {...resizeAttributes}
-        className={`task-resizer w-3 h-full cursor-ew-resize absolute right-0 top-0`}
+        className="task-resizer w-2 h-full cursor-ew-resize absolute right-0 top-0 rounded-r-lg
+                   hover:bg-blue-400/50 transition-colors"
         onMouseDown={handleResizeMouseDown}
-      >
-      </div>
+      />
     </div>
   );
 }

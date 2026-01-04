@@ -165,12 +165,12 @@ export default function GantGrid({
   }
 
   return (
-    <div className="flex-1 flex flex-col dark:bg-[#1f1f1f] overflow-hidden m-0 p-0">
+    <div className="flex-1 flex flex-col bg-background overflow-hidden m-0 p-0">
       {/* Date Navi */}
       <DateNavigation currentDate={currentDate} navigateDate={navigateDate} />
 
       {/* Time Labels */}
-      <div className="flex border-b border-gray-200 dark:bg-[#1f1f1f]">
+      <div className="flex border-b border-border/50 bg-muted/30">
         <div
           className="flex-1 grid"
           style={{
@@ -181,7 +181,7 @@ export default function GantGrid({
           {timeLabels.map((label, index) => (
             <div
               key={index}
-              className="text-xs text-center text-white-600 font-medium py-2 border-b"
+              className="text-xs text-center text-muted-foreground font-semibold py-3 border-r border-border/30 last:border-r-0"
             >
               {label}
             </div>
@@ -192,12 +192,11 @@ export default function GantGrid({
       {/* Main Grid With tasks */}
 
       <div
-        className="flex-1 relative overflow-auto dark:bg-[#1f1f1f]"
+        className="flex-1 relative overflow-auto bg-muted/20"
         style={{
           minWidth: `${TOTAL_DISPLAY_HOURS * HOUR_WIDTH_PX}px`,
-          backgroundSize: `${HOUR_WIDTH_PX}px 100%`,
+          backgroundSize: `${HOUR_WIDTH_PX}px 48px`,
           backgroundImage: `
-            /* vertical hour lines */
             repeating-linear-gradient(
               to right,
               #3a3a3a,
@@ -205,36 +204,16 @@ export default function GantGrid({
               transparent 1px,
               transparent ${HOUR_WIDTH_PX}px
             ),
-            /* horizontal row lines every 40px to match task rows */
             repeating-linear-gradient(
               to bottom,
               #424242,
               #424242 1px,
               transparent 1px,
-              transparent 40px
+              transparent 48px
             )
           `,
         }}
       >
-        <style jsx>{`
-          /* Making sure the dark override applies */
-          .dark .flex-1.relative {
-            background-image: repeating-linear-gradient(
-              to right,
-              #3a3a3a
-              #3a3a3a 1px,
-              transparent 1px
-              transparent ${HOUR_WIDTH_PX}px
-            ),
-            repeating-linear-gradient (
-              to bottom,
-              #424242
-              #424242 1px,
-              transparent 1px,
-              transparent 40px
-            );
-          }
-        `}</style>
         <DndContext
           sensors={sensors}
           onDragMove={handleDragMove}
@@ -246,13 +225,13 @@ export default function GantGrid({
               <GantTask key={task.id} task={task} index={index} />
             ))}
         </DndContext>
-        {/* Horizontal red line to show current time */}
+        {/* Current time indicator */}
         <div
-          className="absolute top-0 bottom-0 w-0.5 bg-red-500 z-10"
+          className="absolute top-0 bottom-0 w-0.5 bg-red-500 z-10 shadow-sm"
           style={{ left: currentTimeLinePos }}
         >
-          <div
-            className="absolute -top-1 -left-1.5 w-3 h-3 bg-red-500 rounded-full"></div>
+          <div className="absolute -top-0.5 -left-1 w-2.5 h-2.5 bg-red-500 rounded-full shadow-md" />
+          <div className="absolute -top-0.5 -left-1 w-2.5 h-2.5 bg-red-500 rounded-full animate-ping opacity-75" />
         </div>
       </div>
     </div>
