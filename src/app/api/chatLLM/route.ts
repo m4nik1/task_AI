@@ -41,6 +41,7 @@ export async function POST(req: NextRequest) {
             return;
           }
           controller.enqueue(value);
+          console.log("Value: ", value)
           pump();
         });
       }

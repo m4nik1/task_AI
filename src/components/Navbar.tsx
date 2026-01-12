@@ -1,13 +1,14 @@
 "use client";
 import { Button } from "./ui/button";
-import { Calendar, LogOut, LogIn } from "lucide-react";
+import { Calendar, LogOut, LogIn, UserCircle } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { authClient } from "@/lib/auth-client";
-import { redirect } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 export default function Navbar() {
   const [userSession, setSession] = useState(null);
+  const router = useRouter();
 
   useEffect(() => {
     async function getSession() {
@@ -20,12 +21,11 @@ export default function Navbar() {
   }, [setSession, userSession]);
 
   async function signOut() {
-    console.log("Signing out");
-    // Add actual sign out logic here later if needed
     await authClient.signOut({
       fetchOptions: {
         onSuccess: () => {
-          redirect('/signIn')
+          setSession(null);
+          router.push('/');
         }
       }
     });
@@ -50,15 +50,26 @@ export default function Navbar() {
               </Link>
             </Button>
           ) : (
-            <Button
-              onClick={signOut}
-              variant="ghost"
-              size="sm"
-              className="text-muted-foreground hover:text-foreground gap-2"
-            >
-              <LogOut className="h-4 w-4" />
-              Sign Out
-            </Button>
+            <div className="group relative">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="rounded-full h-10 w-10 text-muted-foreground hover:text-foreground transition-colors"
+              >
+                <UserCircle className="h-7 w-7" />
+              </Button>
+              <div className="absolute right-0 top-full pt-2 w-48 opacity-0 invisible translate-y-2 group-hover:opacity-100 group-hover:visible group-hover:translate-y-0 transition-all duration-200 ease-in-out z-50">
+                <div className="bg-popover border border-border rounded-lg shadow-lg p-1 overflow-hidden">
+                  <button
+                    onClick={signOut}
+                    className="flex w-full items-center gap-2 px-3 py-2 text-sm text-red-600 hover:bg-red-50 hover:text-red-700 dark:hover:bg-red-950/30 dark:text-red-400 dark:hover:text-red-300 rounded-md transition-colors"
+                  >
+                    <LogOut className="h-4 w-4" />
+                    Sign Out
+                  </button>
+                </div>
+              </div>
+            </div>
           )}
         </div>
       </div>

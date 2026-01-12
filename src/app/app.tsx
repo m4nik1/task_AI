@@ -8,7 +8,7 @@ export default function App({ children }: ApplicationProps) {
   return (
     <div className="h-screen dark:bg-[#1f1f1f] flex flex-col">
       <Navbar />
-      <main className="flex-1 dark:bg-[#1f1f1f]">{children}</main>
+      <main className="flex-1 min-h-0 dark:bg-[#1f1f1f]">{children}</main>
     </div>
   );
 }

@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Send } from "lucide-react";
 
@@ -19,16 +19,31 @@ export default function ChatPanel() {
     },
   ]);
   const [inputValue, setInputValue] = useState("");
+  const [isAtBottom, setIsAtBottom] = useState(true);
   const messagesEndRef = useRef<null | HTMLDivElement>(null);
+  const messagesContainerRef = useRef<null | HTMLDivElement>(null);
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
+  const scrollToBottom = useCallback((smooth = true) => {
+    messagesEndRef.current?.scrollIntoView({ behavior: smooth ? "smooth" : "auto" });
+  }, []);
+
+  const handleScroll = useCallback(() => {
+    const container = messagesContainerRef.current;
+    if (!container) return;
+    const threshold = 40;
+    const atBottom = container.scrollHeight - container.scrollTop - container.clientHeight <= threshold;
+    setIsAtBottom(atBottom);
+  }, []);
+
+  useEffect(() => {
+    if (isAtBottom) {
+      scrollToBottom(false);
+    }
+  }, [messages, isAtBottom, scrollToBottom]);
 
   const handleSend = async () => {
     if (inputValue.trim() === "") return;
 
-    // Add user message
     const userMessage: Message = {
       id: Date.now().toString(),
       text: inputValue,
@@ -36,83 +51,61 @@ export default function ChatPanel() {
       timestamp: new Date(),
     };
 
-    let aiMessage: Message;
-
-    setMessages((prev) => [...prev, userMessage]);
-    setInputValue("");
-    aiMessage = {
-      id: (Date.now() + 1).toString(),
+    const aiMessageId = (Date.now() + 1).toString();
+    const aiMessage: Message = {
+      id: aiMessageId,
       text: "",
       sender: "ai",
       timestamp: new Date(),
     };
 
-
-    setTimeout(() => {
-      aiMessage = {
-        id: (Date.now() + 1).toString(),
-        text: "",
-        sender: "ai",
-        timestamp: new Date(),
-      };
-
-
-      // Make the api request here
-      setMessages((prev) => [...prev, aiMessage]);
-      scrollToBottom();
-    }, 1000);
-
-    const userMessage2 = {
-      id: Date.now(),
-      text: inputValue,
-    };
+    setMessages((prev) => [...prev, userMessage, aiMessage]);
+    setInputValue("");
+    setIsAtBottom(true);
 
     const aiResponse = await fetch("/api/chatLLM", {
       headers: {
         "Content-type": "application/json"
       },
       method: "POST",
-      body: JSON.stringify(userMessage2),
+      body: JSON.stringify({ id: Date.now(), text: inputValue }),
     });
 
-
     const readerStream = aiResponse.body?.getReader();
-
     if (!readerStream) return;
+
     const decoder = new TextDecoder();
-
-
+    let buffer = "";
 
     try {
       while (true) {
         const { done, value } = await readerStream.read();
-        if (done) {
-          // When the stream is done, flush any remaining bytes in the decoder
-          const finalChunk = decoder.decode();
-          if (finalChunk) {
-            console.warn("Final chunk: ", finalChunk);
-          }
-          break;
-        }
+        buffer += decoder.decode(value || new Uint8Array(), { stream: !done });
 
-        if (value) {
-          const chunk = decoder.decode(value, { stream: true });
-          const messageObj = JSON.parse(chunk.split('text:')[1]).text
+        const lines = buffer.split(/\r?\n/);
+        buffer = lines.pop() || "";
 
-          if (messageObj != null) {
-            const aiMessage2 = messageObj
+        for (const line of lines) {
+          const trimmed = line.trim();
+          if (!trimmed.startsWith("data:")) continue;
+
+          const dataStr = trimmed.slice(5).trim();
+          if (!dataStr || dataStr === "[DONE]") continue;
+
+          try {
+            const parsed = JSON.parse(dataStr);
+            const token = parsed?.token ?? parsed?.text ?? "";
+            if (!token) continue;
 
             setMessages((prev) =>
-              prev.map((m) => {
-                if (m.id == aiMessage.id) {
-                  return { ...m, text: m.text + aiMessage2 }
-                } else {
-                  return m;
-                }
-              })
+              prev.map((m) => (m.id === aiMessageId ? { ...m, text: m.text + token } : m))
             );
+          } catch {
+            console.error("Bad SSE JSON:", dataStr);
           }
         }
+
+        if (done) break;
       }
     } catch (error) {
       console.error("Stream reading error:", error);
@@ -129,14 +122,17 @@ export default function ChatPanel() {
   };
 
   return (
-    <div className="w-80 flex-shrink-0 flex flex-col h-full bg-background/60 backdrop-blur-xl border-l border-border">
+    <div className="w-80 flex-shrink-0 flex flex-col h-full min-h-0 bg-background/60 backdrop-blur-xl border-l border-border">
       <div className="flex items-center justify-between px-4 py-3 border-b border-border bg-transparent">
         <h2 className="text-sm font-semibold text-foreground">
           Task Assistant
         </h2>
       </div>
 
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+      <div
+        ref={messagesContainerRef}
+        onScroll={handleScroll}
+        className="flex-1 min-h-0 overflow-y-auto overscroll-contain p-4 space-y-4">
         {messages.map((message) => (
           <div
             key={message.id}

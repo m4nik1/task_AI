@@ -56,8 +56,8 @@ export default function HomePageClient({ taskDB }: HomeProps) {
   }
 
   return (
-    <div className="flex h-full dark:bg-[#1f1f1f] dark:text-gray-100 w-full m-0 p-0">
-      <div className="flex bg-gray-50 dark:bg-[#1f1f1f] w-full h-full">
+    <div className="flex h-full min-h-0 dark:bg-[#1f1f1f] dark:text-gray-100 w-full m-0 p-0">
+      <div className="flex bg-gray-50 dark:bg-[#1f1f1f] w-full h-full min-h-0">
         <TaskList tasks={tasks} setTasks={setTasks} currentDate={currentDate} />
         <div className="flex-1 flex flex-col min-w-0 border-r border-gray-200 dark:border-gray-700 h-full">
           <GantGrid
@@ -67,7 +67,7 @@ export default function HomePageClient({ taskDB }: HomeProps) {
             currentDate={currentDate}
           />
         </div>
-        <div className="flex-shrink-0">
+        <div className="flex-shrink-0 h-full min-h-0">
           <ChatPanel />
         </div>
       </div>
