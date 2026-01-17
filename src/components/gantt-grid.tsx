@@ -199,15 +199,15 @@ export default function GantGrid({
           backgroundImage: `
             repeating-linear-gradient(
               to right,
-              #3a3a3a,
-              #3a3a3a 1px,
+              var(--border),
+              var(--border) 1px,
               transparent 1px,
               transparent ${HOUR_WIDTH_PX}px
             ),
             repeating-linear-gradient(
               to bottom,
-              #424242,
-              #424242 1px,
+              var(--border),
+              var(--border) 1px,
               transparent 1px,
               transparent 48px
             )
