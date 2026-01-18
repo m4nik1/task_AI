@@ -89,18 +89,18 @@ export default function TaskItem({
       {...attributes}
       {...listeners}
       className="flex items-center gap-3 px-4 cursor-move
-            border-b border-gray-250 hover:bg-gray-100 dark:hover:bg-white/50"
+            border-b border-border hover:bg-accent/50"
       style={{ ...style, height: "40px" }}
     >
       <input
         type="checkbox"
         onChange={(e) => taskComplete(e.target.checked)}
-        className="w-3 h-3 border border-dashed border-gray-300 rounded-full flex-shrink-0"
+        className="w-3 h-3 border border-dashed border-border rounded-full flex-shrink-0"
         placeholder="New Task"
       />
       <div className="flex-grow min-w-0">
         <input
-          className={`text-sm font-medium text-gray-900 dark:text-white truncate ${completeCheck ? "line-through" : ""
+          className={`text-sm font-medium bg-transparent text-foreground truncate ${completeCheck ? "line-through" : ""
             }`}
           onKeyDown={confirmTask}
           placeholder="New Task"
