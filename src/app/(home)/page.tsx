@@ -1,33 +1,33 @@
 import prisma from "@/lib/prisma";
 import HomePageClient from "@/components/HomePageClient";
 import LandingPage from "@/components/LandingPage";
-import { headers } from "next/headers";
-import { auth } from "@/lib/auth";
+import { fetchAuthQuery } from "@/lib/auth-server";
+import { api } from "@convex/_generated/api";
 import moment from "moment";
 
+type AuthUser = {
+  _id: string
+}
+
 export default async function HomePage() {
-  let tasks;
-
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
-
-  if (!session) {
+  let user: AuthUser;
+  try {
+    user = await fetchAuthQuery(api.auth.getCurrentUser, {}) as AuthUser
+  } catch {
     return <LandingPage />;
-  } else {
-    console.log("Date: ", moment().toISOString())
-    const date = moment().toISOString()
-
-    tasks = await prisma.usertasks.findMany({
-      orderBy: { id: 'asc' },
-      where: {
-        user_id: session.user.id,
-        // dateCreated: {
-        //
-        // }
-      }
-    })
-    console.log("tasks: ", tasks)
-    return <HomePageClient taskDB={tasks} />;
   }
+
+  console.log("Date: ", moment().toISOString())
+
+  const tasks = await prisma.usertasks.findMany({
+    orderBy: { id: 'asc' },
+    where: {
+      user_id: user._id,
+      // dateCreated: {
+      //
+      // }
+    }
+  })
+  console.log("tasks: ", tasks)
+  return <HomePageClient taskDB={tasks} />;
 }
