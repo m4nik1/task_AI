@@ -7,11 +7,10 @@ export interface Task {
 }
 
 export interface TaskDB {
-  id: number,
-  name: string,
-  status: string,
-  startTime: Date,
-  Duration: number,
-  EndTime: Date,
-  dateCreated: Date
+  id: string | number
+  name: string
+  status: string
+  startTime: Date
+  Duration: number
+  EndTime: Date
 }

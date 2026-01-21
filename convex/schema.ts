@@ -10,4 +10,11 @@ export default defineSchema({
   //   name: v.string(),
   //   email: v.string(),
   // }),
+  tasks: defineTable({
+    name: v.string(),
+    status: v.string(),
+    startTime: v.string(),
+    duration: v.number(),
+    endTime: v.string()
+  })
 });

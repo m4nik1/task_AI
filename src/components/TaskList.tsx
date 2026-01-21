@@ -73,7 +73,6 @@ export default function TaskList({
           </SortableContext>
         </DndContext>
         <CreateTaskButton
-          setTasks={setTasks}
           currentDate={currentDate}
         />
       </div>
