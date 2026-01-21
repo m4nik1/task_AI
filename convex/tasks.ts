@@ -22,3 +22,11 @@ export const createTask = mutation({
     return taskID
   },
 })
+
+export const updateTask = mutation({
+  args: { id: v.id("tasks"), startTime: v.string(), endTime: v.string() },
+  handler: async (ctx, args) => {
+    console.log(await ctx.db.get("tasks", args.id))
+    await ctx.db.patch("tasks", args.id, { startTime: args.startTime, endTime: args.endTime })
+  }
+});
