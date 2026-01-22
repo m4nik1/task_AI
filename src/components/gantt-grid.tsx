@@ -17,6 +17,8 @@ import {
   restrictToHorizontalAxis,
   createSnapModifier,
 } from "@dnd-kit/modifiers";
+import { api } from "../../convex/_generated/api"
+import { useMutation } from "convex/react";
 
 interface gantGridProps {
   setTasks: React.Dispatch<SetStateAction<TaskDB[]>>;
@@ -59,6 +61,8 @@ export default function GantGrid({
 
   const sensors = useSensors(useSensor(PointerSensor));
 
+  const updateTaskTimes = useMutation(api.tasks.updateTaskTimes)
+
   const snapToGrid = createSnapModifier(HOUR_WIDTH_PX);
   async function handleDragEnd({ active, delta }: DragMoveEvent) {
 
@@ -93,10 +97,11 @@ export default function GantGrid({
         })
       )
 
-      await fetch('/api/updateTask/', {
-        method: 'POST',
-        body: JSON.stringify(taskData)
-      })
+      if (taskData) {
+        console.log("updating in convex!")
+        await updateTaskTimes(taskData)
+      }
+
     }
 
     else {
