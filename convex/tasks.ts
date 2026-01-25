@@ -1,5 +1,5 @@
-import { mutation, query } from "./_generated/server"
-import { v } from "convex/values"
+import { mutation, query } from "./_generated/server";
+import { v } from "convex/values";
 
 export const listTasks = query({
   args: {},
@@ -9,24 +9,49 @@ export const listTasks = query({
 });
 
 export const createTask = mutation({
-  args: { name: v.string(), status: v.string(), startTime: v.string(), duration: v.number(), endTime: v.string() },
+  args: {
+    name: v.string(),
+    status: v.string(),
+    startTime: v.string(),
+    duration: v.number(),
+    endTime: v.string(),
+  },
   handler: async (ctx, args) => {
     const taskID = await ctx.db.insert("tasks", {
       name: args.name,
       status: args.status,
       startTime: args.startTime,
       duration: args.duration,
-      endTime: args.endTime
+      endTime: args.endTime,
     });
 
-    return taskID
+    return taskID;
   },
-})
+});
 
 export const updateTaskTimes = mutation({
-  args: { id: v.id("tasks"), startTime: v.string(), Duration: v.number(), endTime: v.string() },
+  args: {
+    id: v.id("tasks"),
+    startTime: v.string(),
+    Duration: v.number(),
+    endTime: v.string(),
+  },
   handler: async (ctx, args) => {
-    console.log(await ctx.db.get("tasks", args.id))
-    await ctx.db.patch("tasks", args.id, { startTime: args.startTime, duration: args.Duration, endTime: args.endTime })
-  }
+    console.log(await ctx.db.get("tasks", args.id));
+    await ctx.db.patch("tasks", args.id, {
+      startTime: args.startTime,
+      duration: args.Duration,
+      endTime: args.endTime,
+    });
+  },
+});
+
+export const rescheduleTask = mutation({
+  args: { id: v.id("tasks"), startTime: v.string(), endTime: v.string() },
+  handler: async (ctx, args) => {
+    await ctx.db.patch("tasks", args.id, {
+      startTime: args.startTime,
+      endTime: args.endTime,
+    });
+  },
 });

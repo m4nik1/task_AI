@@ -11,13 +11,13 @@ import {
   useSensor,
   useSensors,
   DragMoveEvent,
-  UniqueIdentifier
+  UniqueIdentifier,
 } from "@dnd-kit/core";
 import {
   restrictToHorizontalAxis,
   createSnapModifier,
 } from "@dnd-kit/modifiers";
-import { api } from "../../convex/_generated/api"
+import { api } from "../../convex/_generated/api";
 import { useMutation } from "convex/react";
 
 interface gantGridProps {
@@ -44,8 +44,9 @@ export default function GantGrid({
     if (hour === 24) return "12AM";
     if (hour === 25) return "1AM";
     if (hour === 26) return "2AM";
-    return `${hour % 12 === 0 ? 12 : hour % 12}${hour < 12 || hour >= 24 ? "AM" : "PM"
-      }`;
+    return `${hour % 12 === 0 ? 12 : hour % 12}${
+      hour < 12 || hour >= 24 ? "AM" : "PM"
+    }`;
   });
 
   const currentTime = new Date();
@@ -61,12 +62,12 @@ export default function GantGrid({
 
   const sensors = useSensors(useSensor(PointerSensor));
 
-  const updateTaskTimes = useMutation(api.tasks.updateTaskTimes)
+  const updateTaskTimes = useMutation(api.tasks.updateTaskTimes);
+  const rescheduleTask = useMutation(api.tasks.rescheduleTask);
 
   const snapToGrid = createSnapModifier(HOUR_WIDTH_PX);
   async function handleDragEnd({ active, delta }: DragMoveEvent) {
-
-    const taskId = active.id
+    const taskId = active.id;
 
     const minutesPerPx = 60 / HOUR_WIDTH_PX;
 
@@ -75,35 +76,39 @@ export default function GantGrid({
     const snappedMinutes = Math.round(deltaMinutes / 30) * 30;
     let taskData;
 
-    if (typeof taskId === 'string' && taskId.startsWith('resize-')) {
-      const actualId = Number(taskId.replace('resize-', ''));
+    if (typeof taskId === "string" && taskId.startsWith("resize-")) {
+      const actualId = taskId.replace("resize-", "");
 
       setTasks((prev) =>
         prev.map((t) => {
-          if (t.id != actualId) return t;
+          if (t.id.toString() !== actualId) return t;
 
-          console.log("Does this work?")
+          console.log("Does this work?");
 
-          console.log("Resizing in handleDragEnd")
+          console.log("Resizing in handleDragEnd");
 
           const newDuration = Math.max(30, t.Duration + snappedMinutes);
           const newEndTime = new Date(t.startTime.getTime());
 
           newEndTime.setMinutes(newEndTime.getMinutes() + newDuration);
 
-          taskData = { id: t.id, startTime: t.startTime, Duration: newDuration, EndTime: newEndTime }
+          taskData = {
+            id: t.id,
+            startTime: t.startTime.toISOString(),
+            Duration: newDuration,
+            endTime: newEndTime.toISOString(),
+          };
 
-          return { ...t, Duration: newDuration, EndTime: newEndTime }
-        })
-      )
+          return { ...t, Duration: newDuration, EndTime: newEndTime };
+        }),
+      );
 
       if (taskData) {
-        console.log("updating in convex!")
-        await updateTaskTimes(taskData)
+        console.log("updating in convex!");
+        await updateTaskTimes(taskData);
       }
-
     }
-
+    // If we are not resizing then we are moving the task
     else {
       setTasks((prevTasks) =>
         prevTasks.map((t) => {
@@ -112,46 +117,56 @@ export default function GantGrid({
           const newStart = new Date(t.startTime.getTime());
           newStart.setMinutes(newStart.getMinutes() + snappedMinutes);
 
-          const newEndTime = new Date(t.EndTime.getTime())
-          newEndTime.setMinutes(newEndTime.getMinutes() + t.Duration)
+          const newEndTime = new Date(t.EndTime.getTime());
+          newEndTime.setMinutes(newEndTime.getMinutes() + t.Duration);
 
           console.log("New start: ", newStart);
 
-          taskData = { id: t.id, startTime: newStart, EndTime: newEndTime }
+          taskData = {
+            id: t.id,
+            startTime: newStart.toISOString(),
+            endTime: newEndTime.toISOString(),
+          };
 
-          return { ...t, startTime: newStart, EndTime: newEndTime, Duration: t.Duration };
+          return {
+            ...t,
+            startTime: newStart,
+            EndTime: newEndTime,
+            Duration: t.Duration,
+          };
         }),
       );
-      await fetch('/api/updateTask/', {
-        method: 'POST',
-        body: JSON.stringify(taskData)
-      })
+      if (taskData) {
+        console.log("Updating with convex");
+        await rescheduleTask(taskData);
+      }
     }
   }
+
   function handleDragMove({ active, delta }: DragMoveEvent) {
-    const taskId = active.id as UniqueIdentifier
+    const taskId = active.id as UniqueIdentifier;
     console.log("tasks: ", tasks);
 
     // This is for resizing
-    if (typeof taskId === "string" && taskId.startsWith('resize-')) {
-      const actualId = parseInt(taskId.replace('resize-', ''));
+    if (typeof taskId === "string" && taskId.startsWith("resize-")) {
+      const actualId = parseInt(taskId.replace("resize-", ""));
       const deltaMi = delta.x / HOUR_WIDTH_PX;
       const snappedMinutes = Math.round(deltaMi / 30) * 30;
 
-      console.log("Resizing...")
+      console.log("Resizing...");
       setTasks((prevTasks) =>
         prevTasks.map((t) => {
           if (t.id !== actualId) return t;
 
           const newDuration = t.Duration + snappedMinutes;
-          const newEndTime = new Date(t.EndTime.getTime() + newDuration * 60 * 1000);
+          const newEndTime = new Date(
+            t.EndTime.getTime() + newDuration * 60 * 1000,
+          );
 
-
-          return { ...t, Duration: newDuration, EndTime: newEndTime }
-        })
-      )
-    }
-    else {
+          return { ...t, Duration: newDuration, EndTime: newEndTime };
+        }),
+      );
+    } else {
       // Handle regular task dragging (not resize)
       const deltaMinutes = delta.x / HOUR_WIDTH_PX;
       const snappedMinutes = Math.round(deltaMinutes / 15) * 15;
@@ -164,7 +179,7 @@ export default function GantGrid({
           newStart.setMinutes(newStart.getMinutes() + snappedMinutes);
 
           return { ...t, startTime: newStart };
-        })
+        }),
       );
     }
   }
@@ -225,10 +240,9 @@ export default function GantGrid({
           onDragEnd={handleDragEnd}
           modifiers={[restrictToHorizontalAxis, snapToGrid]}
         >
-          {tasks
-            .map((task, index) => (
-              <GantTask key={task.id} task={task} index={index} />
-            ))}
+          {tasks.map((task, index) => (
+            <GantTask key={task.id} task={task} index={index} />
+          ))}
         </DndContext>
         {/* Current time indicator */}
         <div
