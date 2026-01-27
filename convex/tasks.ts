@@ -55,3 +55,12 @@ export const rescheduleTask = mutation({
     });
   },
 });
+
+export const renameTask = mutation({
+  args: { id: v.id("tasks"), newName: v.string() },
+  handler: async (ctx, args) => {
+    await ctx.db.patch("tasks", args.id, {
+      name: args.newName,
+    });
+  },
+});

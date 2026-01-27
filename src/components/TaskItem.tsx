@@ -5,7 +5,8 @@ import { TaskDB } from "../../types";
 import { formatTime } from "@/lib/utils";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-
+import { useMutation } from "convex/react";
+import { api } from "../../convex/_generated/api";
 interface TaskItemProps {
   setTasks: React.Dispatch<React.SetStateAction<TaskDB[]>>;
   task: TaskDB;
@@ -23,6 +24,7 @@ export default function TaskItem({
   const [completeCheck, setCheck] = useState(false);
 
   const taskName = useRef<HTMLInputElement>(null);
+  const updateTaskName = useMutation(api.tasks.renameTask);
 
   const { attributes, listeners, setNodeRef, transform, transition } =
     useSortable({ id: task.id });
@@ -41,7 +43,7 @@ export default function TaskItem({
 
   // Add update change to DB to fix the name of the task
   async function confirmTask(
-    e: React.KeyboardEvent<HTMLInputElement> | undefined
+    e: React.KeyboardEvent<HTMLInputElement> | undefined,
   ) {
     if (e?.code == "Enter") {
       try {
@@ -49,24 +51,24 @@ export default function TaskItem({
         task.name = taskName.current?.value || "";
 
         // This fixes the default value being set for the task ID
-        const confirmedTask = await fetch("/api/updateTaskName", {
-          method: "POST",
-          body: JSON.stringify(task),
-        });
+        // const confirmedTask = await fetch("/api/updateTaskName", {
+        //   method: "POST",
+        //   body: JSON.stringify(task),
+        // });
+        if (task) {
+          updateTaskName({ task.id, task.name });
+        }
 
-        const taskData = await confirmedTask.json();
+        // const taskData = await confirmedTask.json();
 
-        console.log("Confirmed: ", taskData);
+        // console.log("Confirmed: ", taskData);
         newTasks.splice(index, 1, task);
         setTasks(newTasks);
       } catch (err) {
         console.log("We have an error");
         console.error(err);
       }
-    } else if (
-      e?.code == "Backspace" &&
-      taskName.current?.value == ''
-    ) {
+    } else if (e?.code == "Backspace" && taskName.current?.value == "") {
       console.log("Deleting task");
       const newTasks = [...tasks];
       // setTasks(newTasks.splice(index, 1, task))
@@ -77,7 +79,7 @@ export default function TaskItem({
         body: JSON.stringify(task),
       });
 
-      console.log("response for deleting task: ", response)
+      console.log("response for deleting task: ", response);
 
       setTasks(newTasks);
     }
@@ -100,8 +102,9 @@ export default function TaskItem({
       />
       <div className="flex-grow min-w-0">
         <input
-          className={`text-sm font-medium bg-transparent text-foreground truncate ${completeCheck ? "line-through" : ""
-            }`}
+          className={`text-sm font-medium bg-transparent text-foreground truncate ${
+            completeCheck ? "line-through" : ""
+          }`}
           onKeyDown={confirmTask}
           placeholder="New Task"
           ref={taskName}
