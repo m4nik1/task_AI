@@ -24,14 +24,18 @@ export default function ChatPanel() {
   const messagesContainerRef = useRef<null | HTMLDivElement>(null);
 
   const scrollToBottom = useCallback((smooth = true) => {
-    messagesEndRef.current?.scrollIntoView({ behavior: smooth ? "smooth" : "auto" });
+    messagesEndRef.current?.scrollIntoView({
+      behavior: smooth ? "smooth" : "auto",
+    });
   }, []);
 
   const handleScroll = useCallback(() => {
     const container = messagesContainerRef.current;
     if (!container) return;
     const threshold = 40;
-    const atBottom = container.scrollHeight - container.scrollTop - container.clientHeight <= threshold;
+    const atBottom =
+      container.scrollHeight - container.scrollTop - container.clientHeight <=
+      threshold;
     setIsAtBottom(atBottom);
   }, []);
 
@@ -65,7 +69,7 @@ export default function ChatPanel() {
 
     const aiResponse = await fetch("/api/chatLLM", {
       headers: {
-        "Content-type": "application/json"
+        "Content-type": "application/json",
       },
       method: "POST",
       body: JSON.stringify({ id: Date.now(), text: inputValue }),
@@ -98,7 +102,9 @@ export default function ChatPanel() {
             if (!token) continue;
 
             setMessages((prev) =>
-              prev.map((m) => (m.id === aiMessageId ? { ...m, text: m.text + token } : m))
+              prev.map((m) =>
+                m.id === aiMessageId ? { ...m, text: m.text + token } : m,
+              ),
             );
           } catch {
             console.error("Bad SSE JSON:", dataStr);
@@ -132,17 +138,19 @@ export default function ChatPanel() {
       <div
         ref={messagesContainerRef}
         onScroll={handleScroll}
-        className="flex-1 min-h-0 overflow-y-auto overscroll-contain p-4 space-y-4">
+        className="flex-1 min-h-0 overflow-y-auto overscroll-contain p-4 space-y-4"
+      >
         {messages.map((message) => (
           <div
             key={message.id}
             className={`flex ${message.sender === "user" ? "justify-end" : "justify-start"}`}
           >
             <div
-              className={`max-w-[85%] px-4 py-3 rounded-2xl text-sm leading-relaxed shadow-sm ${message.sender === "user"
-                ? "bg-primary text-primary-foreground rounded-tr-sm"
-                : "bg-muted/50 text-foreground rounded-tl-sm border border-border/50"
-                }`}
+              className={`max-w-[85%] px-4 py-3 rounded-2xl text-sm leading-relaxed shadow-sm ${
+                message.sender === "user"
+                  ? "bg-primary text-primary-foreground rounded-tr-sm"
+                  : "bg-muted/50 text-foreground rounded-tl-sm border border-border/50"
+              }`}
             >
               <p>{message.text}</p>
             </div>

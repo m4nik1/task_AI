@@ -8,7 +8,6 @@ import {
   useRef,
 } from "react";
 import { TaskDB } from "../types";
-import { getHourFromX } from "@/lib/utils";
 
 interface DragStartInfo {
   startX: number;
@@ -157,16 +156,6 @@ export function useGanttDrag({
 
   // When the mouse is up we will stop the dragging and set the task stuff
   const handleMouseUp = useCallback(async () => {
-    // if (isDragging && dragStartInfo) {
-
-    // }
-    if (updatedTask.current) {
-      console.log("Final updated task: ", updatedTask.current);
-      //   const response = await fetch("/api/updateTask", {
-      //     method: "POST",
-      //     body: JSON.stringify(updatedTask.current),
-      //   });
-    }
     setIsDragging(false);
     setDragStartInfo(null);
     setDragOffset(0);
