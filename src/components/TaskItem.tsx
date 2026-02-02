@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import * as React from "react";
 import { TaskDB } from "../../types";
 import { formatTime } from "@/lib/utils";
 import { useSortable } from "@dnd-kit/sortable";
@@ -21,9 +21,9 @@ export default function TaskItem({
   index,
   setTasks,
 }: TaskItemProps) {
-  const [completeCheck, setCheck] = useState(false);
+  const [completeCheck, setCheck] = React.useState(false);
 
-  const taskName = useRef<HTMLInputElement>(null);
+  const taskName = React.useRef<HTMLInputElement>(null);
   const updateTaskName = useMutation(api.tasks.renameTask);
 
   const { attributes, listeners, setNodeRef, transform, transition } =
@@ -50,18 +50,10 @@ export default function TaskItem({
         const newTasks = [...tasks];
         task.name = taskName.current?.value || "";
 
-        // This fixes the default value being set for the task ID
-        // const confirmedTask = await fetch("/api/updateTaskName", {
-        //   method: "POST",
-        //   body: JSON.stringify(task),
-        // });
         if (task) {
-          updateTaskName({ task.id, task.name });
+          updateTaskName({ id: task.id, newName: task.name });
         }
 
-        // const taskData = await confirmedTask.json();
-
-        // console.log("Confirmed: ", taskData);
         newTasks.splice(index, 1, task);
         setTasks(newTasks);
       } catch (err) {

@@ -1,3 +1,5 @@
+import type { Id } from "../convex/_generated/dataModel";
+
 export interface Task {
   id: string
   name: string
@@ -7,7 +9,7 @@ export interface Task {
 }
 
 export interface TaskDB {
-  id: string | number
+  id: Id<"tasks">
   name: string
   status: string
   startTime: Date
