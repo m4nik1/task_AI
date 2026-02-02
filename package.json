@@ -8,9 +8,6 @@
     "start": "next start",
     "lint": "next lint"
   },
-  "prisma": {
-    "seed": "tsx prisma/seed.ts"
-  },
   "dependencies": {
     "@convex-dev/better-auth": "^0.10.10",
     "@dnd-kit/core": "^6.3.1",
@@ -35,7 +32,7 @@
     "react-dom": "19.1.0",
     "react-hook-form": "^7.62.0",
     "tailwind-merge": "^3.3.1",
-    "vercel": "^48.10.11",
+    "vercel": "^50.9.6",
     "zod": "^4.1.5"
   },
   "devDependencies": {

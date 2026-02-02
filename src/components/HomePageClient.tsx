@@ -8,15 +8,11 @@ import { TaskDB } from "../../types";
 import { useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
 
-interface HomeProps {
-  taskDB: TaskDB[];
-}
-
-export default function HomePageClient({ taskDB }: HomeProps) {
+export default function HomePageClient() {
   const [currentDate, setCurrentDate] = useState<Date | null>(null);
   const [isClient, setIsClient] = useState(false);
 
-  const [tasks, setTasks] = useState<TaskDB[]>(taskDB);
+  const [tasks, setTasks] = useState<TaskDB[]>([]);
   const convexTasks = useQuery(api.tasks.listTasks);
   const [currentTasks, setCurrentTasks] = useState<TaskDB[]>([]);
 
@@ -46,7 +42,9 @@ export default function HomePageClient({ taskDB }: HomeProps) {
 
   const tasksForDate = useMemo(() => {
     if (!currentDate) return [];
-    return tasks.filter((t) => checkingDates(new Date(t.startTime), currentDate));
+    return tasks.filter((t) =>
+      checkingDates(new Date(t.startTime), currentDate),
+    );
   }, [currentDate, tasks]);
 
   const navigateDate = (direction: number) => {

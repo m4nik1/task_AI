@@ -66,12 +66,12 @@ export default function TaskItem({
       // setTasks(newTasks.splice(index, 1, task))
       newTasks.splice(index, 1);
 
-      const response = await fetch("/api/deleteTask", {
-        method: "POST",
-        body: JSON.stringify(task),
-      });
+      // const response = await fetch("/api/deleteTask", {
+      //   method: "POST",
+      //   body: JSON.stringify(task),
+      // });
 
-      console.log("response for deleting task: ", response);
+      console.log("Deleting task...");
 
       setTasks(newTasks);
     }
