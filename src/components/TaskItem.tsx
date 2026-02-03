@@ -12,7 +12,7 @@ interface TaskItemProps {
   task: TaskDB;
   tasks: TaskDB[];
   index: number;
-  id: number;
+  id: TaskDB["id"];
 }
 
 export default function TaskItem({

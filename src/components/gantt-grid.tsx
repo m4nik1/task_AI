@@ -1,6 +1,6 @@
 "use client";
 
-import { SetStateAction } from "react";
+import * as React from "react";
 import { TaskDB } from "../../types";
 import { getXFromHour } from "@/lib/utils";
 import GantTask from "./gantTask";
@@ -21,7 +21,7 @@ import { api } from "../../convex/_generated/api";
 import { useMutation } from "convex/react";
 
 interface gantGridProps {
-  setTasks: React.Dispatch<SetStateAction<TaskDB[]>>;
+  setTasks: React.Dispatch<React.SetStateAction<TaskDB[]>>;
   tasks: TaskDB[];
   navigateDate: (direction: number) => void;
   currentDate: Date;
@@ -67,7 +67,7 @@ export default function GantGrid({
 
   const snapToGrid = createSnapModifier(HOUR_WIDTH_PX);
   async function handleDragEnd({ active, delta }: DragMoveEvent) {
-    const taskId = active.id;
+    const taskId = String(active.id);
 
     const minutesPerPx = 60 / HOUR_WIDTH_PX;
 
@@ -76,12 +76,12 @@ export default function GantGrid({
     const snappedMinutes = Math.round(deltaMinutes / 30) * 30;
     let taskData;
 
-    if (typeof taskId === "string" && taskId.startsWith("resize-")) {
+    if (taskId.startsWith("resize-")) {
       const actualId = taskId.replace("resize-", "");
 
       setTasks((prev) =>
         prev.map((t) => {
-          if (t.id.toString() !== actualId) return t;
+          if (String(t.id) !== actualId) return t;
 
           console.log("Does this work?");
 
@@ -95,7 +95,7 @@ export default function GantGrid({
           taskData = {
             id: t.id,
             startTime: t.startTime.toISOString(),
-            Duration: newDuration,
+            duration: newDuration,
             endTime: newEndTime.toISOString(),
           };
 
@@ -112,7 +112,7 @@ export default function GantGrid({
     else {
       setTasks((prevTasks) =>
         prevTasks.map((t) => {
-          if (t.id.toString() !== taskId) return t;
+          if (String(t.id) !== taskId) return t;
 
           const newStart = new Date(t.startTime.getTime());
           newStart.setMinutes(newStart.getMinutes() + snappedMinutes);
@@ -144,20 +144,19 @@ export default function GantGrid({
   }
 
   function handleDragMove({ active, delta }: DragMoveEvent) {
-    const taskId = active.id as UniqueIdentifier;
+    const taskId = String(active.id as UniqueIdentifier);
     console.log("tasks: ", tasks);
 
     // This is for resizing
-    if (typeof taskId === "string" && taskId.startsWith("resize-")) {
-      const actualId = parseInt(taskId.replace("resize-", ""));
+    if (taskId.startsWith("resize-")) {
+      const actualId = taskId.replace("resize-", "");
       const deltaMi = delta.x / HOUR_WIDTH_PX;
       const snappedMinutes = Math.round(deltaMi / 30) * 30;
 
       console.log("Resizing...");
       setTasks((prevTasks) =>
         prevTasks.map((t) => {
-          if (t.id !== actualId) return t;
-
+          if (String(t.id) !== actualId) return t;
           const newDuration = t.Duration + snappedMinutes;
           const newEndTime = new Date(
             t.EndTime.getTime() + newDuration * 60 * 1000,
@@ -173,7 +172,7 @@ export default function GantGrid({
 
       setTasks((prevTasks) =>
         prevTasks.map((t) => {
-          if (t.id.toString() !== taskId) return t;
+          if (String(t.id) !== taskId) return t;
 
           const newStart = new Date(t.startTime.getTime());
           newStart.setMinutes(newStart.getMinutes() + snappedMinutes);

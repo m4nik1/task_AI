@@ -32,10 +32,10 @@ export default function TaskList({
   function handleDragEnd(event: DragEndEvent) {
     const { active, over } = event;
 
-    if (active.id !== over?.id) {
+    if (String(active.id) !== String(over?.id)) {
       setTasks((prevTasks) => {
-        const oldIndex = prevTasks.findIndex((t) => t.id == active.id);
-        const newIndex = prevTasks.findIndex((t) => t.id == over?.id);
+        const oldIndex = prevTasks.findIndex((t) => String(t.id) == String(active.id));
+        const newIndex = prevTasks.findIndex((t) => String(t.id) == String(over?.id));
         const move = arrayMove(prevTasks, oldIndex, newIndex);
 
         return move;
@@ -58,7 +58,7 @@ export default function TaskList({
           onDragEnd={handleDragEnd}
         >
           <SortableContext
-            items={tasks.map(t => t.id)}
+            items={tasks.map(t => String(t.id))}
           >
             {tasks.map((t, index) => (
               <TaskItem
