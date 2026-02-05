@@ -45,7 +45,7 @@ export default function TaskList({
 
   return (
     <div className="w-80 flex-shrink-0 pt-[65px] bg-background border-r border-border flex flex-col">
-      <div className="flex items-center px-4 h-[32.8px] border-b border-border">
+      <div className="flex items-center px-4 h-[40px] border-b border-border">
         <h2 className="text-lg font-semibold text-foreground">
           Tasks
         </h2>

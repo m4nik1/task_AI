@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
-import { Send } from "lucide-react";
+import { ChevronRight, Send } from "lucide-react";
 
 interface Message {
   id: string;
@@ -9,7 +9,11 @@ interface Message {
   timestamp: Date;
 }
 
-export default function ChatPanel() {
+interface ChatPanelProps {
+  onHide: () => void;
+}
+
+export default function ChatPanel({ onHide }: ChatPanelProps) {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "1",
@@ -128,17 +132,26 @@ export default function ChatPanel() {
   };
 
   return (
-    <div className="w-80 flex-shrink-0 flex flex-col h-full min-h-0 bg-background/60 backdrop-blur-xl border-l border-border">
-      <div className="flex items-center justify-between px-4 py-3 border-b border-border bg-transparent">
+    <div className="relative w-80 flex-shrink-0 flex flex-col h-full min-h-0 bg-background/40 backdrop-blur-2xl border-l border-white/10 shadow-[0_10px_30px_rgba(0,0,0,0.08)] before:pointer-events-none before:absolute before:inset-0 before:bg-gradient-to-b before:from-slate-200/20 before:via-slate-200/10 before:to-transparent before:content-['']">
+      <div className="flex items-center justify-between px-4 py-3 border-b border-white/10 bg-background/30 backdrop-blur-md shadow-sm">
         <h2 className="text-sm font-semibold text-foreground">
           Task Assistant
         </h2>
+        <Button
+          onClick={onHide}
+          size="icon"
+          variant="ghost"
+          className="h-8 w-8 rounded-full text-muted-foreground hover:text-foreground hover:bg-white/10"
+          aria-label="Hide chat panel"
+        >
+          <ChevronRight className="h-4 w-4" />
+        </Button>
       </div>
 
       <div
         ref={messagesContainerRef}
         onScroll={handleScroll}
-        className="flex-1 min-h-0 overflow-y-auto overscroll-contain p-4 space-y-4"
+        className="flex-1 min-h-0 overflow-y-auto overscroll-contain p-4 space-y-5 bg-gradient-to-b from-slate-200/10 to-transparent"
       >
         {messages.map((message) => (
           <div
@@ -146,10 +159,10 @@ export default function ChatPanel() {
             className={`flex ${message.sender === "user" ? "justify-end" : "justify-start"}`}
           >
             <div
-              className={`max-w-[85%] px-4 py-3 rounded-2xl text-sm leading-relaxed shadow-sm ${
+              className={`max-w-[85%] px-4 py-3 rounded-2xl text-sm leading-relaxed backdrop-blur-sm shadow-sm ${
                 message.sender === "user"
-                  ? "bg-primary text-primary-foreground rounded-tr-sm"
-                  : "bg-muted/50 text-foreground rounded-tl-sm border border-border/50"
+                  ? "bg-gradient-to-br from-primary/80 to-primary/60 text-primary-foreground rounded-tr-sm border border-white/10 shadow-md shadow-primary/20"
+                  : "bg-white/10 text-foreground rounded-tl-sm border border-white/15 shadow-sm"
               }`}
             >
               <p>{message.text}</p>
@@ -159,7 +172,7 @@ export default function ChatPanel() {
         <div ref={messagesEndRef} />
       </div>
 
-      <div className="p-4 bg-transparent border-t border-border">
+      <div className="p-4 bg-background/20 backdrop-blur-xl border-t border-white/10">
         <div className="relative">
           <input
             type="text"
@@ -167,13 +180,13 @@ export default function ChatPanel() {
             onChange={(e) => setInputValue(e.target.value)}
             onKeyDown={handleKeyPress}
             placeholder="Ask AI..."
-            className="w-full text-sm rounded-full bg-muted/50 border-none px-4 py-3 pr-12 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring transition-all"
+            className="w-full text-sm rounded-full bg-white/10 border border-white/10 px-4 py-3 pr-12 text-foreground placeholder:text-muted-foreground backdrop-blur-md focus:outline-none focus:ring-2 focus:ring-white/20 focus:bg-white/15 transition-all"
           />
           <Button
             onClick={handleSend}
             size="icon"
             variant="ghost"
-            className="absolute right-1.5 top-1.5 h-9 w-9 hover:bg-background/50 rounded-full text-muted-foreground hover:text-primary"
+            className="absolute right-1.5 top-1.5 h-9 w-9 hover:bg-white/10 rounded-full text-muted-foreground hover:text-primary"
             disabled={inputValue.trim() === ""}
           >
             <Send className="h-4 w-4" />

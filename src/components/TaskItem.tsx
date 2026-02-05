@@ -84,7 +84,7 @@ export default function TaskItem({
       {...listeners}
       className="flex items-center gap-3 px-4 cursor-move
             border-b border-border hover:bg-accent/50"
-      style={{ ...style, height: "40px" }}
+      style={{ ...style, height: "48px" }}
     >
       <input
         type="checkbox"

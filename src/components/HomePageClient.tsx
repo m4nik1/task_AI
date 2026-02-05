@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { ChevronLeft } from "lucide-react";
 import TaskList from "./TaskList";
 import GantGrid from "./gantt-grid";
 import ChatPanel from "./ChatPanel";
@@ -11,6 +12,7 @@ import { api } from "../../convex/_generated/api";
 export default function HomePageClient() {
   const [currentDate, setCurrentDate] = useState<Date | null>(null);
   const [isClient, setIsClient] = useState(false);
+  const [isChatHidden, setIsChatHidden] = useState(false);
 
   const [tasks, setTasks] = useState<TaskDB[]>([]);
   const convexTasks = useQuery(api.tasks.listTasks);
@@ -82,7 +84,19 @@ export default function HomePageClient() {
           />
         </div>
         <div className="flex-shrink-0 h-full min-h-0">
-          <ChatPanel />
+          {isChatHidden ? (
+            <div className="h-full min-h-0 w-10 border-l border-white/10 bg-background/30 backdrop-blur-2xl shadow-[0_10px_30px_rgba(0,0,0,0.08)] flex items-center justify-center">
+              <button
+                className="h-8 w-8 rounded-full text-muted-foreground hover:text-foreground hover:bg-white/10 flex items-center justify-center"
+                onClick={() => setIsChatHidden(false)}
+                aria-label="Show chat panel"
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </button>
+            </div>
+          ) : (
+            <ChatPanel onHide={() => setIsChatHidden(true)} />
+          )}
         </div>
       </div>
     </div>
