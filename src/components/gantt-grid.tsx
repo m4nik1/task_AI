@@ -37,7 +37,7 @@ export default function GantGrid({
   const START_HOUR_DISPLAY = 7; // Start time for the visible grid (7 AM)
   const END_HOUR_DISPLAY = 24; // End time for the visible grid (2 AM next day, 24 + 2 = 26)
   const TOTAL_DISPLAY_HOURS = END_HOUR_DISPLAY - START_HOUR_DISPLAY;
-  const TOTAL_DISPLAY_TIME = 20;
+  const TOTAL_DISPLAY_COLUMNS = TOTAL_DISPLAY_HOURS + 1;
 
   const timeLabels = Array.from({ length: TOTAL_DISPLAY_HOURS + 1 }, (_, i) => {
     const hour = START_HOUR_DISPLAY + i;
@@ -184,38 +184,40 @@ export default function GantGrid({
   }
 
   return (
-    <div className="flex-1 flex flex-col bg-background overflow-hidden m-0 p-0">
+    <div className="flex-1 flex flex-col bg-background m-0 p-0 min-h-0">
       {/* Date Navi */}
       <DateNavigation currentDate={currentDate} navigateDate={navigateDate} />
 
-      {/* Time Labels */}
-      <div className="flex border-b border-border/50 bg-muted/30">
-        <div
-          className="flex-1 grid"
-          style={{
-            gridTemplateColumns: `repeat(${TOTAL_DISPLAY_TIME}, ${HOUR_WIDTH_PX}px)`,
-            minWidth: `${TOTAL_DISPLAY_HOURS * HOUR_WIDTH_PX}px`, // Ensure minimum width
-          }}
-        >
-          {timeLabels.map((label, index) => (
+      <div className="flex-1 flex flex-col overflow-x-auto min-h-0">
+        <div className="min-w-max flex flex-col min-h-0 h-full">
+          {/* Time Labels */}
+          <div className="flex border-b border-border/50 bg-muted/30">
             <div
-              key={index}
-              className="text-xs text-center text-muted-foreground font-semibold py-3 border-r border-border/30 last:border-r-0"
+              className="grid"
+              style={{
+                gridTemplateColumns: `repeat(${TOTAL_DISPLAY_COLUMNS}, ${HOUR_WIDTH_PX}px)`,
+                minWidth: `${TOTAL_DISPLAY_COLUMNS * HOUR_WIDTH_PX}px`,
+              }}
             >
-              {label}
+              {timeLabels.map((label, index) => (
+                <div
+                  key={index}
+                  className="text-xs text-center text-muted-foreground font-semibold py-3 border-r border-border/30 last:border-r-0"
+                >
+                  {label}
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
-      </div>
+          </div>
 
-      {/* Main Grid With tasks */}
+          {/* Main Grid With tasks */}
 
-      <div
-        className="flex-1 relative overflow-auto bg-muted/20"
-        style={{
-          minWidth: `${TOTAL_DISPLAY_HOURS * HOUR_WIDTH_PX}px`,
-          backgroundSize: `${HOUR_WIDTH_PX}px 48px`,
-          backgroundImage: `
+          <div
+            className="flex-1 relative overflow-y-auto bg-muted/20 min-h-0 h-full"
+            style={{
+              minWidth: `${TOTAL_DISPLAY_COLUMNS * HOUR_WIDTH_PX}px`,
+              backgroundSize: `${HOUR_WIDTH_PX}px 48px`,
+              backgroundImage: `
             repeating-linear-gradient(
               to right,
               var(--border),
@@ -231,25 +233,27 @@ export default function GantGrid({
               transparent 48px
             )
           `,
-        }}
-      >
-        <DndContext
-          sensors={sensors}
-          onDragMove={handleDragMove}
-          onDragEnd={handleDragEnd}
-          modifiers={[restrictToHorizontalAxis, snapToGrid]}
-        >
-          {tasks.map((task, index) => (
-            <GantTask key={task.id} task={task} index={index} />
-          ))}
-        </DndContext>
-        {/* Current time indicator */}
-        <div
-          className="absolute top-0 bottom-0 w-0.5 bg-red-500 z-10 shadow-sm"
-          style={{ left: currentTimeLinePos }}
-        >
-          <div className="absolute -top-0.5 -left-1 w-2.5 h-2.5 bg-red-500 rounded-full shadow-md" />
-          <div className="absolute -top-0.5 -left-1 w-2.5 h-2.5 bg-red-500 rounded-full animate-ping opacity-75" />
+            }}
+          >
+            <DndContext
+              sensors={sensors}
+              onDragMove={handleDragMove}
+              onDragEnd={handleDragEnd}
+              modifiers={[restrictToHorizontalAxis, snapToGrid]}
+            >
+              {tasks.map((task, index) => (
+                <GantTask key={task.id} task={task} index={index} />
+              ))}
+            </DndContext>
+            {/* Current time indicator */}
+            <div
+              className="absolute top-0 bottom-0 w-0.5 bg-red-500 z-10 shadow-sm"
+              style={{ left: currentTimeLinePos }}
+            >
+              <div className="absolute -top-0.5 -left-1 w-2.5 h-2.5 bg-red-500 rounded-full shadow-md" />
+              <div className="absolute -top-0.5 -left-1 w-2.5 h-2.5 bg-red-500 rounded-full animate-ping opacity-75" />
+            </div>
+          </div>
         </div>
       </div>
     </div>
