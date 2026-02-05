@@ -31,7 +31,7 @@ export default function DateNavigation({
           <Button
             variant="ghost"
             size="icon"
-            className="h-8 w-8 hover:bg-muted"
+            className="h-8 w-8 hover:bg-muted cursor-pointer"
             onClick={() => navigateDate(-1)}
             aria-label="Previous day"
           >
@@ -40,7 +40,7 @@ export default function DateNavigation({
           <Button
             variant="ghost"
             size="icon"
-            className="h-8 w-8 hover:bg-muted"
+            className="h-8 w-8 hover:bg-muted cursor-pointer"
             onClick={() => navigateDate(1)}
             aria-label="Next day"
           >
