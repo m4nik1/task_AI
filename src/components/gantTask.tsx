@@ -1,6 +1,6 @@
 import { useDraggable } from "@dnd-kit/core";
 import { TaskDB } from "../../types";
-import { useCallback } from "react";
+import * as React from "react";
 
 interface GantTaskProps {
   task: TaskDB;
@@ -13,7 +13,7 @@ export default function GantTask({ task, index }: GantTaskProps) {
   let widthPx = (task.Duration / 60) * HOUR_WIDTH_PX;
 
   const { attributes, listeners, setNodeRef, transform } = useDraggable({
-    id: task.id.toString(),
+    id: String(task.id),
   });
 
   const {
@@ -22,10 +22,10 @@ export default function GantTask({ task, index }: GantTaskProps) {
     setNodeRef: setResizeNodeRef,
     transform: resizeTransform,
   } = useDraggable({
-    id: `resize-${task.id}`,
+    id: `resize-${String(task.id)}`,
   });
 
-  const handleResizeMouseDown = useCallback((e: React.MouseEvent) => {
+  const handleResizeMouseDown = React.useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
     // eslint-disable-next-line react-hooks/exhaustive-deps
     if (resizeTransform) widthPx += resizeTransform.x;

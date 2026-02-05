@@ -1,23 +1,19 @@
-import { auth } from "@/lib/auth";
-import { headers } from "next/headers";
+import { fetchAuthQuery } from "@/lib/auth-server";
+import { api } from "@convex/_generated/api";
 import { NextResponse } from "next/server";
 
 export async function GET() {
-    const getSession = await auth.api.getSession({
-      headers: await headers()
-    })
-
-    if(!getSession) {
+    try {
+      const user = await fetchAuthQuery(api.auth.getCurrentUser, {})
+      return NextResponse.json({
+          data: JSON.stringify(user),
+          status: 201
+      })
+    } catch {
       return NextResponse.json({
         data: null,
         status: 201
      })
-    }
-    else {
-      return NextResponse.json({
-          data: JSON.stringify(getSession),
-          status: 201
-      })
     }
 
 }

@@ -1,37 +1,28 @@
-import { TaskDB } from "../../types";
+import { useMutation } from "convex/react";
+import { api } from "../../convex/_generated/api"
 
 interface CreateTaskProps {
-  setTasks: React.Dispatch<React.SetStateAction<TaskDB[]>>;
   currentDate: Date;
 }
 
 export default function CreateTaskButton({
-  setTasks,
   currentDate,
 }: CreateTaskProps) {
+  const createTask = useMutation(api.tasks.createTask)
+
   async function createNewTask() {
-    const date = new Date().toISOString()
-
-    const newTask: TaskDB = {
-      id: -1,
+    const newTask = {
       name: "New Task",
-      dateCreated: new Date(date),
-      startTime: currentDate,
+      startTime: currentDate.toISOString(),
       status: "Scheduled",
-      Duration: 60, // Default duration
-      EndTime: currentDate,
+      duration: 60,
+      endTime: currentDate.toISOString(),
     };
-    try {
-      const res = await fetch("/api/addTask", {
-        method: "POST",
-        body: JSON.stringify(newTask),
-      });
 
-      const taskID = await res.json();
+    try {
+      const taskID = await createTask(newTask)
       console.log("task id from add task api: ", taskID);
-      newTask.id = taskID.data;
-      setTasks((prevTasks) => [...prevTasks, newTask]);
-    } catch(e) {
+    } catch (e) {
       console.log(e)
     }
   }

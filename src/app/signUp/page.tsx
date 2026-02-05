@@ -28,7 +28,7 @@ export default function SignUp() {
           email,
           name,
           password,
-          callbackURL: "/signIn",
+          callbackURL: "/",
         },
         {
           onSuccess: () => {

@@ -1,20 +1,19 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import TaskList from "./TaskList";
 import GantGrid from "./gantt-grid";
 import ChatPanel from "./ChatPanel";
 import { TaskDB } from "../../types";
+import { useQuery } from "convex/react";
+import { api } from "../../convex/_generated/api";
 
-interface HomeProps {
-  taskDB: TaskDB[];
-}
-
-export default function HomePageClient({ taskDB }: HomeProps) {
+export default function HomePageClient() {
   const [currentDate, setCurrentDate] = useState<Date | null>(null);
   const [isClient, setIsClient] = useState(false);
 
-  const [tasks, setTasks] = useState<TaskDB[]>(taskDB);
+  const [tasks, setTasks] = useState<TaskDB[]>([]);
+  const convexTasks = useQuery(api.tasks.listTasks);
   const [currentTasks, setCurrentTasks] = useState<TaskDB[]>([]);
 
   useEffect(() => {
@@ -22,15 +21,31 @@ export default function HomePageClient({ taskDB }: HomeProps) {
     setIsClient(true);
   }, []);
 
+  useEffect(() => {
+    if (convexTasks) {
+      const normalizedTasks = convexTasks.map((task) => ({
+        ...task,
+        id: task._id,
+        startTime: new Date(task.startTime),
+        EndTime: new Date(task.endTime),
+        Duration: task.duration,
+      }));
+      setTasks(normalizedTasks);
+    }
+  }, [convexTasks]);
+
   function checkingDates(date1: Date, date2: Date) {
     return (
       date1.getDate() == date2.getDate() && date1.getMonth() == date2.getMonth()
     );
   }
 
-  const tasksForDate = currentDate
-    ? tasks.filter((t) => checkingDates(new Date(t.startTime), currentDate))
-    : [];
+  const tasksForDate = useMemo(() => {
+    if (!currentDate) return [];
+    return tasks.filter((t) =>
+      checkingDates(new Date(t.startTime), currentDate),
+    );
+  }, [currentDate, tasks]);
 
   const navigateDate = (direction: number) => {
     if (!currentDate) return;
@@ -42,10 +57,9 @@ export default function HomePageClient({ taskDB }: HomeProps) {
 
   useEffect(() => {
     if (currentDate) {
-      setCurrentTasks(tasks);
+      setCurrentTasks(tasksForDate);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentDate]);
+  }, [currentDate, tasksForDate]);
 
   if (!isClient || !currentDate) {
     return (
