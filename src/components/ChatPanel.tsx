@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { ChevronRight, Send } from "lucide-react";
+import { useChat } from "@ai-sdk/react";
 
 interface Message {
   id: string;
@@ -14,15 +15,17 @@ interface ChatPanelProps {
 }
 
 export default function ChatPanel({ onHide }: ChatPanelProps) {
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: "1",
-      text: "Hello! How can I help you with your tasks today?",
-      sender: "ai",
-      timestamp: new Date(),
-    },
-  ]);
+  // const [messages, setMessages] = useState<Message[]>([
+  //   {
+  //     id: "1",
+  //     text: "Hello! How can I help you with your tasks today?",
+  //     sender: "ai",
+  //     timestamp: new Date(),
+  //   },
+  // ]);
+
   const [inputValue, setInputValue] = useState("");
+  const { messages, sendMessage } = useChat();
   const [isAtBottom, setIsAtBottom] = useState(true);
   const messagesEndRef = useRef<null | HTMLDivElement>(null);
   const messagesContainerRef = useRef<null | HTMLDivElement>(null);
@@ -49,85 +52,85 @@ export default function ChatPanel({ onHide }: ChatPanelProps) {
     }
   }, [messages, isAtBottom, scrollToBottom]);
 
-  const handleSend = async () => {
-    if (inputValue.trim() === "") return;
+  // const handleSend = async () => {
+  //   if (inputValue.trim() === "") return;
 
-    const userMessage: Message = {
-      id: Date.now().toString(),
-      text: inputValue,
-      sender: "user",
-      timestamp: new Date(),
-    };
+  //   const userMessage: Message = {
+  //     id: Date.now().toString(),
+  //     text: inputValue,
+  //     sender: "user",
+  //     timestamp: new Date(),
+  //   };
 
-    const aiMessageId = (Date.now() + 1).toString();
-    const aiMessage: Message = {
-      id: aiMessageId,
-      text: "",
-      sender: "ai",
-      timestamp: new Date(),
-    };
+  //   const aiMessageId = (Date.now() + 1).toString();
+  //   const aiMessage: Message = {
+  //     id: aiMessageId,
+  //     text: "",
+  //     sender: "ai",
+  //     timestamp: new Date(),
+  //   };
 
-    setMessages((prev) => [...prev, userMessage, aiMessage]);
-    setInputValue("");
-    setIsAtBottom(true);
+  //   setMessages((prev) => [...prev, userMessage, aiMessage]);
+  //   setInputValue("");
+  //   setIsAtBottom(true);
 
-    const aiResponse = await fetch("/api/chatLLM", {
-      headers: {
-        "Content-type": "application/json",
-      },
-      method: "POST",
-      body: JSON.stringify({ id: Date.now(), text: inputValue }),
-    });
+  //   const aiResponse = await fetch("/api/chatLLM", {
+  //     headers: {
+  //       "Content-type": "application/json",
+  //     },
+  //     method: "POST",
+  //     body: JSON.stringify({ id: Date.now(), text: inputValue }),
+  //   });
 
-    const readerStream = aiResponse.body?.getReader();
-    if (!readerStream) return;
+  //   const readerStream = aiResponse.body?.getReader();
+  //   if (!readerStream) return;
 
-    const decoder = new TextDecoder();
-    let buffer = "";
+  //   const decoder = new TextDecoder();
+  //   let buffer = "";
 
-    try {
-      while (true) {
-        const { done, value } = await readerStream.read();
-        buffer += decoder.decode(value || new Uint8Array(), { stream: !done });
+  //   try {
+  //     while (true) {
+  //       const { done, value } = await readerStream.read();
+  //       buffer += decoder.decode(value || new Uint8Array(), { stream: !done });
 
-        const lines = buffer.split(/\r?\n/);
-        buffer = lines.pop() || "";
+  //       const lines = buffer.split(/\r?\n/);
+  //       buffer = lines.pop() || "";
 
-        for (const line of lines) {
-          const trimmed = line.trim();
-          if (!trimmed.startsWith("data:")) continue;
+  //       for (const line of lines) {
+  //         const trimmed = line.trim();
+  //         if (!trimmed.startsWith("data:")) continue;
 
-          const dataStr = trimmed.slice(5).trim();
-          if (!dataStr || dataStr === "[DONE]") continue;
+  //         const dataStr = trimmed.slice(5).trim();
+  //         if (!dataStr || dataStr === "[DONE]") continue;
 
-          try {
-            const parsed = JSON.parse(dataStr);
-            const token = parsed?.token ?? parsed?.text ?? "";
-            if (!token) continue;
+  //         try {
+  //           const parsed = JSON.parse(dataStr);
+  //           const token = parsed?.token ?? parsed?.text ?? "";
+  //           if (!token) continue;
 
-            setMessages((prev) =>
-              prev.map((m) =>
-                m.id === aiMessageId ? { ...m, text: m.text + token } : m,
-              ),
-            );
-          } catch {
-            console.error("Bad SSE JSON:", dataStr);
-          }
-        }
+  //           setMessages((prev) =>
+  //             prev.map((m) =>
+  //               m.id === aiMessageId ? { ...m, text: m.text + token } : m,
+  //             ),
+  //           );
+  //         } catch {
+  //           console.error("Bad SSE JSON:", dataStr);
+  //         }
+  //       }
 
-        if (done) break;
-      }
-    } catch (error) {
-      console.error("Stream reading error:", error);
-    } finally {
-      readerStream.releaseLock();
-    }
-  };
+  //       if (done) break;
+  //     }
+  //   } catch (error) {
+  //     console.error("Stream reading error:", error);
+  //   } finally {
+  //     readerStream.releaseLock();
+  //   }
+  // };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
-      handleSend();
+      // handleSend();
     }
   };
 
@@ -173,17 +176,23 @@ export default function ChatPanel({ onHide }: ChatPanelProps) {
       </div>
 
       <div className="p-4 bg-background/20 backdrop-blur-xl border-t border-white/10">
-        <div className="relative">
+        <form
+          className="relative"
+          onSubmit={(e) => {
+            e.preventDefault();
+            sendMessage({ text: inputValue });
+            setInputValue("");
+          }}
+        >
           <input
             type="text"
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
-            onKeyDown={handleKeyPress}
+            // onKeyDown={handleKeyPress}
             placeholder="Ask AI..."
             className="w-full text-sm rounded-full bg-white/10 border border-white/10 px-4 py-3 pr-12 text-foreground placeholder:text-muted-foreground backdrop-blur-md focus:outline-none focus:ring-2 focus:ring-white/20 focus:bg-white/15 transition-all"
           />
           <Button
-            onClick={handleSend}
             size="icon"
             variant="ghost"
             className="absolute right-1.5 top-1.5 h-9 w-9 hover:bg-white/10 rounded-full text-muted-foreground hover:text-primary"
@@ -191,7 +200,7 @@ export default function ChatPanel({ onHide }: ChatPanelProps) {
           >
             <Send className="h-4 w-4" />
           </Button>
-        </div>
+        </form>
       </div>
     </div>
   );
