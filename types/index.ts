@@ -8,6 +8,16 @@ export interface Task {
   color: string
 }
 
+export interface TaskConvex {
+  _id: Id<"tasks">; 
+  _creationTime: number; 
+  name: string; 
+  status: string; 
+  startTime: string; 
+  duration: number; 
+  endTime: string;
+}
+
 export interface TaskDB {
   id: Id<"tasks">
   name: string
