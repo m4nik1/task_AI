@@ -31,21 +31,6 @@ export const createTask = mutation({
   },
 });
 
-export const getTasks = query({ 
-  handler: async (ctx) => {
-    const tasks = await ctx.db.query("tasks").collect()
-
-    const tasks_found : TaskConvex[] = []
-
-    tasks.forEach(task => {
-      const taskStart = moment.utc(task.startTime);
-      if(taskStart.year() == 2026) {
-        tasks_found.push(task);
-      } 
-    })
-  }
-})
-
 export const updateTaskTimes = mutation({
   args: {
     id: v.id("tasks"),
