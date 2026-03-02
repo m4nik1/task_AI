@@ -7,13 +7,13 @@ import {
   useSensor,
   useSensors,
 } from "@dnd-kit/core";
-import { TaskDB } from "../../types";
+import { TaskConvex, TaskDB } from "../../types";
 import TaskItem from "./TaskItem";
 import CreateTaskButton from "./createTaskButton";
 import { arrayMove, SortableContext } from "@dnd-kit/sortable";
 
 interface TaskListProps {
-  tasks: TaskDB[];
+  tasks: TaskConvex[] | undefined;
   setTasks: React.Dispatch<React.SetStateAction<TaskDB[]>>;
   currentDate: Date;
 }
@@ -23,6 +23,7 @@ export default function TaskList({
   setTasks,
   currentDate,
 }: TaskListProps) {
+  const safeTasks = tasks ?? [];
   const sensors = useSensors(useSensor(PointerSensor));
 
   function handleDragEnd(event: DragEndEvent) {
@@ -50,24 +51,29 @@ export default function TaskList({
       </div>
 
       <div className="flex-1 relative">
-        <DndContext
-          sensors={sensors}
-          collisionDetection={closestCenter}
-          onDragEnd={handleDragEnd}
-        >
-          <SortableContext items={tasks.map((t) => String(t.id))}>
-            {tasks.map((t, index) => (
-              <TaskItem
-                id={t.id}
-                key={t.id}
-                task={t}
-                tasks={tasks}
-                index={index}
-                setTasks={setTasks}
-              />
-            ))}
-          </SortableContext>
-        </DndContext>
+        {tasks === undefined ? (
+          <div className="px-4 py-3 text-sm text-muted-foreground">
+            Loading tasks...
+          </div>
+        ) : (
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragEnd={handleDragEnd}
+          >
+            <SortableContext items={safeTasks.map((t) => t._id)}>
+              {safeTasks.map((t, index) => (
+                <TaskItem
+                  id={t._id}
+                  key={t._id}
+                  task={t}
+                  tasks={safeTasks}
+                  index={index}
+                />
+              ))}
+            </SortableContext>
+          </DndContext>
+        )}
         <CreateTaskButton currentDate={currentDate} />
       </div>
     </div>

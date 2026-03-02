@@ -1,43 +1,39 @@
 "use client";
 
 import * as React from "react";
-import { TaskDB } from "../../types";
+import { TaskConvex, TaskDB } from "../../types";
 import { formatTime } from "@/lib/utils";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { useMutation } from "convex/react";
 import { api } from "../../convex/_generated/api";
+import moment from "moment";
+
 interface TaskItemProps {
-  setTasks: React.Dispatch<React.SetStateAction<TaskDB[]>>;
-  task: TaskDB;
-  tasks: TaskDB[];
+  task: TaskConvex;
+  tasks: TaskConvex[];
   index: number;
   id: TaskDB["id"];
 }
 
-export default function TaskItem({
-  task,
-  tasks,
-  index,
-  setTasks,
-}: TaskItemProps) {
+export default function TaskItem({ task, tasks, index }: TaskItemProps) {
   const [completeCheck, setCheck] = React.useState(false);
 
   const taskName = React.useRef<HTMLInputElement>(null);
   const updateTaskName = useMutation(api.tasks.renameTask);
 
   const { attributes, listeners, setNodeRef, transform, transition } =
-    useSortable({ id: task.id });
+    useSortable({ id: task._id });
 
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
   };
 
+  // TODO: Update convex db with check mark
   function taskComplete(complete: boolean) {
     const newTasks = [...tasks];
     newTasks.splice(index, 1, task);
-    setTasks(newTasks);
     setCheck(complete);
   }
 
@@ -51,29 +47,21 @@ export default function TaskItem({
         task.name = taskName.current?.value || "";
 
         if (task) {
-          updateTaskName({ id: task.id, newName: task.name });
+          updateTaskName({ id: task._id, newName: task.name });
         }
 
         newTasks.splice(index, 1, task);
-        setTasks(newTasks);
       } catch (err) {
         console.log("We have an error");
         console.error(err);
       }
     } else if (e?.code == "Backspace" && taskName.current?.value == "") {
-      console.log("Deleting task");
       const newTasks = [...tasks];
-      // setTasks(newTasks.splice(index, 1, task))
       newTasks.splice(index, 1);
-
-      // const response = await fetch("/api/deleteTask", {
-      //   method: "POST",
-      //   body: JSON.stringify(task),
-      // });
 
       console.log("Deleting task...");
 
-      setTasks(newTasks);
+      // TODO: Add delete task
     }
   }
 
@@ -107,10 +95,10 @@ export default function TaskItem({
         />
 
         <div className="flex items-center text-xs background-gray mt-0.5">
-          <span>{formatTime(task.startTime.getHours())}</span>
+          <span>{formatTime(moment.utc(task.startTime).hour())}</span>
           <span className="mx-1">-</span>
           <span>
-            {formatTime(task.startTime.getHours() + task.Duration / 60)}
+            {formatTime(moment.utc(task.startTime).hour() + task.duration / 60)}
           </span>
         </div>
       </div>

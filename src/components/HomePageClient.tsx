@@ -74,7 +74,11 @@ export default function HomePageClient() {
   return (
     <div className="flex h-full min-h-0 bg-background text-foreground w-full m-0 p-0">
       <div className="flex bg-background w-full h-full min-h-0">
-        <TaskList tasks={tasks} setTasks={setTasks} currentDate={currentDate} />
+        <TaskList
+          tasks={convexTasks}
+          setTasks={setTasks}
+          currentDate={currentDate}
+        />
         <div className="flex-1 flex flex-col min-w-0 border-r border-border h-full">
           <GantGrid
             setTasks={setTasks}
