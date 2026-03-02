@@ -19,6 +19,19 @@ export async function POST(req: Request) {
         execute: async () => {
           return await convex.query(api.tasks.listTasks)
         }
+      }),
+      addTask: tool({
+        description:'schedule tasks for user',
+        inputSchema: z.object({
+          name: z.string().describe('Name of the task'),
+          startTime: z.string().describe('Start time of task in ISO timestamp'),
+          endTime: z.string().describe("End time of task with ISO time stamp"),
+          duration: z.number().describe('duration of task in minutes')
+
+        }),
+        execute: async ({ name, startTime, endTime, duration }) => {
+          return await convex.mutation(api.tasks.createTask, { name: name, status: 'scheduled', startTime: startTime, endTime, duration: duration })
+        }
       })
     },
     stopWhen: stepCountIs(5),
