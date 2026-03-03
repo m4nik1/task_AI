@@ -81,7 +81,6 @@ export default function HomePageClient() {
         />
         <div className="flex-1 flex flex-col min-w-0 border-r border-border h-full">
           <GantGrid
-            setTasks={setTasks}
             tasks={tasks}
             navigateDate={navigateDate}
             currentDate={currentDate}

@@ -1,6 +1,5 @@
 import { useDraggable } from "@dnd-kit/core";
 import { TaskDB } from "../../types";
-import * as React from "react";
 
 interface GantTaskProps {
   task: TaskDB;
@@ -10,7 +9,8 @@ interface GantTaskProps {
 export default function GantTask({ task, index }: GantTaskProps) {
   const HOUR_WIDTH_PX = 70; // Pixels per hour
   const START_HOUR_DISPLAY = 7; // Start time for the visible grid (7 AM)
-  let widthPx = (task.Duration / 60) * HOUR_WIDTH_PX;
+  const MIN_TASK_DURATION_MINUTES = 30;
+  const widthPx = (task.Duration / 60) * HOUR_WIDTH_PX;
 
   const { attributes, listeners, setNodeRef, transform } = useDraggable({
     id: String(task.id),
@@ -25,16 +25,13 @@ export default function GantTask({ task, index }: GantTaskProps) {
     id: `resize-${String(task.id)}`,
   });
 
-  const handleResizeMouseDown = React.useCallback((e: React.MouseEvent) => {
-    e.stopPropagation();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    if (resizeTransform) widthPx += resizeTransform.x;
-  }, []);
+  const startHour = task.startTime.getHours() + task.startTime.getMinutes() / 60;
+  const minWidthPx = (MIN_TASK_DURATION_MINUTES / 60) * HOUR_WIDTH_PX;
+  const resizePreviewWidth = Math.max(minWidthPx, widthPx + (resizeTransform?.x ?? 0));
 
   const style = {
-    left: `${(task.startTime.getHours() - START_HOUR_DISPLAY) * HOUR_WIDTH_PX
-      }px`,
-    width: widthPx,
+    left: `${(startHour - START_HOUR_DISPLAY) * HOUR_WIDTH_PX}px`,
+    width: resizePreviewWidth,
     top: `${index * 48 + 8}px`,
     transform: transform
       ? `translate3d(${transform.x}px, ${transform.y}px, 0)`
@@ -60,7 +57,6 @@ export default function GantTask({ task, index }: GantTaskProps) {
         {...resizeAttributes}
         className="task-resizer w-2 h-full cursor-ew-resize absolute right-0 top-0 rounded-r-lg
                    hover:bg-blue-400/50 transition-colors"
-        onMouseDown={handleResizeMouseDown}
       />
     </div>
   );

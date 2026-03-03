@@ -1,6 +1,4 @@
 "use client";
-
-import * as React from "react";
 import { TaskDB } from "../../types";
 import { getXFromHour } from "@/lib/utils";
 import GantTask from "./gantTask";
@@ -10,8 +8,7 @@ import {
   PointerSensor,
   useSensor,
   useSensors,
-  DragMoveEvent,
-  UniqueIdentifier,
+  DragEndEvent,
 } from "@dnd-kit/core";
 import {
   restrictToHorizontalAxis,
@@ -21,19 +18,20 @@ import { api } from "../../convex/_generated/api";
 import { useMutation } from "convex/react";
 
 interface gantGridProps {
-  setTasks: React.Dispatch<React.SetStateAction<TaskDB[]>>;
   tasks: TaskDB[];
   navigateDate: (direction: number) => void;
   currentDate: Date;
 }
 
 export default function GantGrid({
-  setTasks,
   tasks,
   navigateDate,
   currentDate,
 }: gantGridProps) {
   const HOUR_WIDTH_PX = 70; // Pixels per hour
+  const MOVE_SNAP_MINUTES = 15;
+  const RESIZE_SNAP_MINUTES = 30;
+  const MIN_TASK_DURATION_MINUTES = 30;
   const START_HOUR_DISPLAY = 7; // Start time for the visible grid (7 AM)
   const END_HOUR_DISPLAY = 24; // End time for the visible grid (2 AM next day, 24 + 2 = 26)
   const TOTAL_DISPLAY_HOURS = END_HOUR_DISPLAY - START_HOUR_DISPLAY;
@@ -65,121 +63,66 @@ export default function GantGrid({
   const updateTaskTimes = useMutation(api.tasks.updateTaskTimes);
   const rescheduleTask = useMutation(api.tasks.rescheduleTask);
 
-  const snapToGrid = createSnapModifier(HOUR_WIDTH_PX);
-  async function handleDragEnd({ active, delta }: DragMoveEvent) {
+  const snapToGrid = createSnapModifier(
+    (HOUR_WIDTH_PX * MOVE_SNAP_MINUTES) / 60,
+  );
+
+  function snapDeltaMinutes(deltaX: number, snapMinutes: number) {
+    const deltaMinutes = deltaX * (60 / HOUR_WIDTH_PX);
+    return Math.round(deltaMinutes / snapMinutes) * snapMinutes;
+  }
+
+  async function handleDragEnd({ active, delta }: DragEndEvent) {
     const taskId = String(active.id);
-
-    const minutesPerPx = 60 / HOUR_WIDTH_PX;
-
-    const deltaMinutes = delta.x * minutesPerPx;
-
-    const snappedMinutes = Math.round(deltaMinutes / 30) * 30;
     let taskData;
 
     if (taskId.startsWith("resize-")) {
       const actualId = taskId.replace("resize-", "");
+      const task = tasks.find((t) => String(t.id) === actualId);
 
-      setTasks((prev) =>
-        prev.map((t) => {
-          if (String(t.id) !== actualId) return t;
+      if (!task) return;
 
-          console.log("Does this work?");
-
-          console.log("Resizing in handleDragEnd");
-
-          const newDuration = Math.max(30, t.Duration + snappedMinutes);
-          const newEndTime = new Date(t.startTime.getTime());
-
-          newEndTime.setMinutes(newEndTime.getMinutes() + newDuration);
-
-          taskData = {
-            id: t.id,
-            startTime: t.startTime.toISOString(),
-            duration: newDuration,
-            endTime: newEndTime.toISOString(),
-          };
-
-          return { ...t, Duration: newDuration, EndTime: newEndTime };
-        }),
+      const snappedMinutes = snapDeltaMinutes(delta.x, RESIZE_SNAP_MINUTES);
+      const newDuration = Math.max(
+        MIN_TASK_DURATION_MINUTES,
+        task.Duration + snappedMinutes,
       );
+      const newEndTime = new Date(task.startTime.getTime());
+      newEndTime.setMinutes(newEndTime.getMinutes() + newDuration);
+
+      taskData = {
+        id: task.id,
+        startTime: task.startTime.toISOString(),
+        Duration: newDuration,
+        endTime: newEndTime.toISOString(),
+      };
 
       if (taskData) {
-        console.log("updating in convex!");
         await updateTaskTimes(taskData);
       }
     }
     // If we are not resizing then we are moving the task
     else {
-      setTasks((prevTasks) =>
-        prevTasks.map((t) => {
-          if (String(t.id) !== taskId) return t;
+      const task = tasks.find((t) => String(t.id) === taskId);
 
-          const newStart = new Date(t.startTime.getTime());
-          newStart.setMinutes(newStart.getMinutes() + snappedMinutes);
+      if (!task) return;
 
-          const newEndTime = new Date(t.EndTime.getTime());
-          newEndTime.setMinutes(newEndTime.getMinutes() + t.Duration);
+      const snappedMinutes = snapDeltaMinutes(delta.x, MOVE_SNAP_MINUTES);
+      const newStart = new Date(task.startTime.getTime());
+      newStart.setMinutes(newStart.getMinutes() + snappedMinutes);
 
-          console.log("New start: ", newStart);
+      const newEndTime = new Date(newStart.getTime());
+      newEndTime.setMinutes(newEndTime.getMinutes() + task.Duration);
 
-          taskData = {
-            id: t.id,
-            startTime: newStart.toISOString(),
-            endTime: newEndTime.toISOString(),
-          };
+      taskData = {
+        id: task.id,
+        startTime: newStart.toISOString(),
+        endTime: newEndTime.toISOString(),
+      };
 
-          return {
-            ...t,
-            startTime: newStart,
-            EndTime: newEndTime,
-            Duration: t.Duration,
-          };
-        }),
-      );
       if (taskData) {
-        console.log("Updating with convex");
         await rescheduleTask(taskData);
       }
-    }
-  }
-
-  function handleDragMove({ active, delta }: DragMoveEvent) {
-    const taskId = String(active.id as UniqueIdentifier);
-    console.log("tasks: ", tasks);
-
-    // This is for resizing
-    if (taskId.startsWith("resize-")) {
-      const actualId = taskId.replace("resize-", "");
-      const deltaMi = delta.x / HOUR_WIDTH_PX;
-      const snappedMinutes = Math.round(deltaMi / 30) * 30;
-
-      console.log("Resizing...");
-      setTasks((prevTasks) =>
-        prevTasks.map((t) => {
-          if (String(t.id) !== actualId) return t;
-          const newDuration = t.Duration + snappedMinutes;
-          const newEndTime = new Date(
-            t.EndTime.getTime() + newDuration * 60 * 1000,
-          );
-
-          return { ...t, Duration: newDuration, EndTime: newEndTime };
-        }),
-      );
-    } else {
-      // Handle regular task dragging (not resize)
-      const deltaMinutes = delta.x / HOUR_WIDTH_PX;
-      const snappedMinutes = Math.round(deltaMinutes / 15) * 15;
-
-      setTasks((prevTasks) =>
-        prevTasks.map((t) => {
-          if (String(t.id) !== taskId) return t;
-
-          const newStart = new Date(t.startTime.getTime());
-          newStart.setMinutes(newStart.getMinutes() + snappedMinutes);
-
-          return { ...t, startTime: newStart };
-        }),
-      );
     }
   }
 
@@ -237,7 +180,6 @@ export default function GantGrid({
           >
             <DndContext
               sensors={sensors}
-              onDragMove={handleDragMove}
               onDragEnd={handleDragEnd}
               modifiers={[restrictToHorizontalAxis, snapToGrid]}
             >

@@ -7,7 +7,6 @@ import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { useMutation } from "convex/react";
 import { api } from "../../convex/_generated/api";
-import moment from "moment";
 
 interface TaskItemProps {
   task: TaskConvex;
@@ -18,9 +17,14 @@ interface TaskItemProps {
 
 export default function TaskItem({ task, tasks, index }: TaskItemProps) {
   const [completeCheck, setCheck] = React.useState(false);
+  const startDate = new Date(task.startTime);
+  const endDate = new Date(startDate.getTime() + task.duration * 60 * 1000);
+  const startHour = startDate.getHours() + startDate.getMinutes() / 60;
+  const endHour = endDate.getHours() + endDate.getMinutes() / 60;
 
   const taskName = React.useRef<HTMLInputElement>(null);
   const updateTaskName = useMutation(api.tasks.renameTask);
+  const deleteTask = useMutation(api.tasks.deleteTask);
 
   const { attributes, listeners, setNodeRef, transform, transition } =
     useSortable({ id: task._id });
@@ -62,6 +66,7 @@ export default function TaskItem({ task, tasks, index }: TaskItemProps) {
       console.log("Deleting task...");
 
       // TODO: Add delete task
+      deleteTask({ id: task._id });
     }
   }
 
@@ -95,11 +100,9 @@ export default function TaskItem({ task, tasks, index }: TaskItemProps) {
         />
 
         <div className="flex items-center text-xs background-gray mt-0.5">
-          <span>{formatTime(moment.utc(task.startTime).hour())}</span>
+          <span>{formatTime(startHour)}</span>
           <span className="mx-1">-</span>
-          <span>
-            {formatTime(moment.utc(task.startTime).hour() + task.duration / 60)}
-          </span>
+          <span>{formatTime(endHour)}</span>
         </div>
       </div>
       <hr className="my-12 h-0.5 border-t-0 bg-amber-400" />
