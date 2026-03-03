@@ -11,7 +11,10 @@ export async function POST(req: Request) {
 
   const result = streamText({
     model: groq("moonshotai/kimi-k2-instruct-0905"),
-    messages: await convertToModelMessages(messages),
+    messages: [{
+      role: 'system',
+      content: "You are an expert task scheduler, and you can convert times to an iso timestamp. Todays date is march 2nd 2026",
+    }, ...(await convertToModelMessages(messages))],
     tools: {
       getTasks: tool({
         description: 'list tasks for user',
